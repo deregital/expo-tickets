@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
+import TopBar from '@/components/Header/TopBar';
+import { TRPCReactProvider } from '@/server/trpc/client';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -23,12 +25,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang='en'>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
-      </body>
-    </html>
+    <TRPCReactProvider>
+      <html lang='en'>
+        <body
+          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        >
+          <div className=''>
+            <TopBar />
+            {children}
+          </div>
+        </body>
+      </html>
+    </TRPCReactProvider>
   );
 }
