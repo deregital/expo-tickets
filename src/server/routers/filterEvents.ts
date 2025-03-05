@@ -14,7 +14,7 @@ export const filterEventsRouter = router({
             },
           },
           headers: {
-            Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im5pY28iLCJpZCI6ImM4Mzk4NzVmLTUwYzUtNDU3My04MTM3LWU3NmI3MDY5MjBiZCIsInN1YiI6eyJ1c2Vybm5hbWUiOiJuaWNvIn0sImlhdCI6MTc0MTIxMzkzMywiZXhwIjoxNzQxMjE3NTMzfQ.sZTfbvjkNkKeQX-d-Dpk60ou5qH2OXfYlXIbWm1F-4I`,
+            Authorization: `Bearer ${process.env.EXPO_BACKEND_TOKEN}`,
           },
         },
       );
@@ -27,7 +27,7 @@ export const filterEventsRouter = router({
   getProvinces: publicProcedure.query(async ({ ctx }) => {
     const { data, error } = await ctx.fetch.GET('/location/arg-states', {
       headers: {
-        Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im5pY28iLCJpZCI6ImM4Mzk4NzVmLTUwYzUtNDU3My04MTM3LWU3NmI3MDY5MjBiZCIsInN1YiI6eyJ1c2Vybm5hbWUiOiJuaWNvIn0sImlhdCI6MTc0MTIxMzkzMywiZXhwIjoxNzQxMjE3NTMzfQ.sZTfbvjkNkKeQX-d-Dpk60ou5qH2OXfYlXIbWm1F-4I`,
+        Authorization: `Bearer ${process.env.EXPO_BACKEND_TOKEN}`,
       },
     });
     if (error) {
@@ -39,7 +39,7 @@ export const filterEventsRouter = router({
   getEvents: publicProcedure.query(async ({ ctx }) => {
     const { data, error } = await ctx.fetch.GET('/event/find-active', {
       headers: {
-        Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im5pY28iLCJpZCI6ImM4Mzk4NzVmLTUwYzUtNDU3My04MTM3LWU3NmI3MDY5MjBiZCIsInN1YiI6eyJ1c2Vybm5hbWUiOiJuaWNvIn0sImlhdCI6MTc0MTIxMzkzMywiZXhwIjoxNzQxMjE3NTMzfQ.sZTfbvjkNkKeQX-d-Dpk60ou5qH2OXfYlXIbWm1F-4I`,
+        Authorization: `Bearer ${process.env.EXPO_BACKEND_TOKEN}`,
       },
     });
     if (error) {
