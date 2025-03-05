@@ -1,9 +1,8 @@
-import { publicProcedure, router } from '@/server/trpc';
+import { router } from '@/server/trpc';
+import { filterEventsRouter } from '@/server/routers/filterEvents';
 
 export const appRouter = router({
-  hello: publicProcedure.query(() => {
-    return { greeting: 'Hello, World!' };
-  }),
+  filterEvents: filterEventsRouter,
 });
 
 export type AppRouter = typeof appRouter;
