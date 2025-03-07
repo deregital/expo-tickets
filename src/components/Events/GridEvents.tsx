@@ -2,7 +2,7 @@ import { formatEventDate } from '@/lib/utils';
 import CardEvent from './CardEvent';
 import { trpc } from '@/server/trpc/server';
 
-function GridEvents() {
+async function GridEvents() {
   const events = await trpc.filterEvents.getEvents();
   if (!events)
     return (
