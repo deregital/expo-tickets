@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import {
@@ -25,21 +25,22 @@ function FilterEvents() {
     trpc.filterEvents.getCitiesByState.useQuery(provinceSelected, {
       enabled: provinceSelected !== '',
     });
-  useEffect(() => {
-    console.log(provinceSelected);
-  }, [provinceSelected]);
-  function handleSearch(e: React.ChangeEvent<HTMLInputElement>) {
-    setSearch(e.target.value);
-  }
-  function handleBuscar() {
-    console.log('Buscar');
-  }
+
+  // Función para manejar la selección de provincia
   function handleProvinceChange(value: string) {
+    // Si se selecciona la misma provincia, deseleccionarla
     if (value === provinceSelected) {
       setProvinceSelected('');
     } else {
       setProvinceSelected(value);
     }
+  }
+
+  function handleSearch(e: React.ChangeEvent<HTMLInputElement>) {
+    setSearch(e.target.value);
+  }
+  function handleBuscar() {
+    console.log('Buscar');
   }
 
   function getNextMonths(count: number) {
@@ -92,19 +93,21 @@ function FilterEvents() {
         />
         <Search className='absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4' />
       </div>
-      <Select onValueChange={(value) => handleProvinceChange(value)}>
-        <SelectTrigger className='w-[300px] bg-MiExpo_white'>
-          <SelectValue placeholder='Provincia' />
-        </SelectTrigger>
-        <SelectContent>
-          {!isLoadingProvinces &&
-            provinces?.states.map((state: string) => (
-              <SelectItem key={state} value={state}>
-                {state}
-              </SelectItem>
-            ))}
-        </SelectContent>
-      </Select>
+      <div className='relative w-[300px]'>
+        <Select value={provinceSelected} onValueChange={handleProvinceChange}>
+          <SelectTrigger className='w-full bg-MiExpo_white'>
+            <SelectValue placeholder='Provincia' />
+          </SelectTrigger>
+          <SelectContent>
+            {!isLoadingProvinces &&
+              provinces?.states.map((state: string) => (
+                <SelectItem key={state} value={state}>
+                  {state}
+                </SelectItem>
+              ))}
+          </SelectContent>
+        </Select>
+      </div>
       <Select>
         <SelectTrigger
           className='w-[300px] bg-MiExpo_white'
