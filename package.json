@@ -10,6 +10,7 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "@radix-ui/react-dialog": "^1.1.6",
     "@radix-ui/react-select": "^2.1.6",
     "@radix-ui/react-slot": "^1.1.2",
     "@tanstack/react-query": "^5.67.1",
@@ -21,6 +22,7 @@
     "expo-backend-types": "^0.34.0",
     "lucide-react": "^0.477.0",
     "next": "15.2.1",
+    "nuqs": "^2.4.1",
     "openapi-fetch": "^0.13.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
@@ -28,7 +30,8 @@
     "superjson": "^2.2.2",
     "tailwind-merge": "^3.0.2",
     "tailwindcss-animate": "^1.0.7",
-    "zod": "^3.24.2"
+    "zod": "^3.24.2",
+    "zustand": "^5.0.3"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

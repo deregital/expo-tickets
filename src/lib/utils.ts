@@ -11,6 +11,10 @@ export function formatEventDate(dateString: string) {
   // Obtener el día (número)
   const day = date.getDate().toString().padStart(2, '0');
 
+  // Obtener el día de la semana (abreviado en español)
+  const dayOfWeekNames = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+  const dayOfWeek = dayOfWeekNames[date.getDay()];
+
   // Obtener el mes (abreviado en español)
   const monthNames = [
     'Ene',
@@ -36,5 +40,5 @@ export function formatEventDate(dateString: string) {
   const minutes = date.getMinutes().toString().padStart(2, '0');
   const time = `${hours}:${minutes}`;
 
-  return { day, month, year, time };
+  return { day, month, year, time, dayOfWeek };
 }

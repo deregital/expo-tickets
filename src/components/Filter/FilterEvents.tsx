@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import {
@@ -10,37 +10,108 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Search } from 'lucide-react';
-import { trpc } from '@/server/trpc/client';
+import { useFilter, useLocationData } from '@/lib/useFilter';
+import { useQueryState } from 'nuqs';
 
 function FilterEvents() {
-  const [search, setSearch] = useState('');
-  const [date, setDate] = useState('');
-  const [location, setLocation] = useState('');
-  const [provinceSelected, setProvinceSelected] = useState('');
-  const [citySelected, setCitySelected] = useState('');
+  const [searchParam, setSearchParam] = useQueryState('search');
+  const [provinceParam, setProvinceParam] = useQueryState('province');
+  const [cityParam, setCityParam] = useQueryState('city');
+  const [dateParam, setDateParam] = useQueryState('date');
 
-  const { data: provinces, isLoading: isLoadingProvinces } =
-    trpc.filterEvents.getProvinces.useQuery();
-  const { data: cities, isLoading: isLoadingCities } =
-    trpc.filterEvents.getCitiesByState.useQuery(provinceSelected, {
-      enabled: provinceSelected !== '',
-    });
+  const storeSearch = useFilter((state) => state.search);
+  const storeProvince = useFilter((state) => state.province);
+  const storeCity = useFilter((state) => state.city);
+  const storeDate = useFilter((state) => state.date);
+  const provinces = useFilter((state) => state.provinces);
+  const cities = useFilter((state) => state.cities);
 
-  // Función para manejar la selección de provincia
+  const setSearch = useFilter((state) => state.setSearch);
+  const setProvince = useFilter((state) => state.setProvince);
+  const setCity = useFilter((state) => state.setCity);
+  const setDate = useFilter((state) => state.setDate);
+
+  const [localSearch, setLocalSearch] = useState('');
+  const [localProvince, setLocalProvince] = useState('');
+  const [localCity, setLocalCity] = useState('');
+  const [localDate, setLocalDate] = useState('');
+
+  useLocationData();
+
+  const isLoadingProvinces = provinces.length === 0;
+  const isLoadingCities = localProvince !== '' && cities.length === 0;
+
+  useEffect(() => {
+    setLocalSearch(searchParam || storeSearch || '');
+    setLocalProvince(provinceParam || storeProvince || '');
+    setLocalCity(cityParam || storeCity || '');
+    setLocalDate(dateParam || storeDate || '');
+
+    if (searchParam) setSearch(searchParam);
+    if (provinceParam) setProvince(provinceParam);
+    if (cityParam) setCity(cityParam);
+    if (dateParam) setDate(dateParam);
+  }, [
+    searchParam,
+    provinceParam,
+    cityParam,
+    dateParam,
+    storeSearch,
+    storeProvince,
+    storeCity,
+    storeDate,
+    setSearch,
+    setProvince,
+    setCity,
+    setDate,
+  ]);
+
   function handleProvinceChange(value: string) {
-    // Si se selecciona la misma provincia, deseleccionarla
-    if (value === provinceSelected) {
-      setProvinceSelected('');
+    if (value === localProvince) {
+      setLocalProvince('');
+      setLocalCity(''); // Reset city when province is cleared
     } else {
-      setProvinceSelected(value);
+      setLocalProvince(value);
+    }
+  }
+
+  function handleCityChange(value: string) {
+    if (value === localCity) {
+      setLocalCity('');
+    } else {
+      setLocalCity(value);
+    }
+  }
+
+  function handleDateChange(value: string) {
+    if (value === localDate) {
+      setLocalDate('');
+    } else {
+      setLocalDate(value);
     }
   }
 
   function handleSearch(e: React.ChangeEvent<HTMLInputElement>) {
-    setSearch(e.target.value);
+    setLocalSearch(e.target.value);
   }
+
   function handleBuscar() {
-    console.log('Buscar');
+    setSearch(localSearch);
+    setProvince(localProvince);
+    setCity(localCity);
+    setDate(localDate);
+
+    setSearchParam(localSearch || null);
+    setProvinceParam(localProvince || null);
+    setCityParam(localCity || null);
+    setDateParam(localDate || null);
+
+    console.log('Filtros aplicados:', {
+      search: localSearch,
+      province: localProvince,
+      city: localCity,
+      date: localDate,
+    });
   }
 
   function getNextMonths(count: number) {
@@ -88,66 +159,103 @@ function FilterEvents() {
           type='text'
           placeholder='Buscar evento en MiExpo'
           className='pl-3 pr-10 py-2 w-full bg-MiExpo_white'
-          value={search}
+          value={localSearch}
           onChange={handleSearch}
         />
         <Search className='absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4' />
       </div>
       <div className='relative w-[300px]'>
-        <Select value={provinceSelected} onValueChange={handleProvinceChange}>
+        <Select
+          disabled={isLoadingProvinces}
+          value={localProvince}
+          onValueChange={handleProvinceChange}
+        >
           <SelectTrigger className='w-full bg-MiExpo_white'>
             <SelectValue placeholder='Provincia' />
           </SelectTrigger>
           <SelectContent>
-            {!isLoadingProvinces &&
-              provinces?.states.map((state: string) => (
-                <SelectItem key={state} value={state}>
-                  {state}
-                </SelectItem>
-              ))}
+            {provinces.map((state: string) => (
+              <SelectItem key={state} value={state}>
+                {state}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
+        {localProvince && (
+          <button
+            className='absolute right-10 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 z-10'
+            onClick={(e) => {
+              e.stopPropagation();
+              setLocalProvince('');
+              setLocalCity(''); // Reset city when province is cleared
+            }}
+            aria-label='Limpiar selección de provincia'
+          >
+            ✕
+          </button>
+        )}
       </div>
-      <Select>
-        <SelectTrigger
-          className='w-[300px] bg-MiExpo_white'
-          disabled={!cities?.cities || cities.cities.length === 0}
-        >
-          <SelectValue placeholder='Localidad' />
-        </SelectTrigger>
-        <SelectContent>
-          {!isLoadingCities &&
-            cities?.cities.map(
-              (city: {
-                id: string;
-                name: string;
-                centroid: { lon: number; lat: number };
-              }) => (
-                <SelectItem key={city.id} value={city.name}>
-                  {city.name}
-                </SelectItem>
-              ),
-            )}
-        </SelectContent>
-      </Select>
-      <Select>
-        <SelectTrigger className='w-[300px] bg-MiExpo_white'>
-          <SelectValue placeholder='Fecha' />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value='hoy'>Hoy</SelectItem>
-          <SelectItem value='manana'>Mañana</SelectItem>
-          <SelectItem value='esta-semana'>Esta semana</SelectItem>
-          <SelectItem value='este-mes'>Este mes</SelectItem>
+      <div className='relative w-[300px]'>
+        <Select value={localCity} onValueChange={handleCityChange}>
+          <SelectTrigger
+            className='w-full bg-MiExpo_white'
+            disabled={!localProvince || cities.length === 0}
+          >
+            <SelectValue placeholder='Localidad' />
+          </SelectTrigger>
+          <SelectContent>
+            {cities.map((cityData) => (
+              <SelectItem key={cityData.id} value={cityData.name}>
+                {cityData.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        {localCity && (
+          <button
+            className='absolute right-10 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 z-10'
+            onClick={(e) => {
+              e.stopPropagation();
+              setLocalCity('');
+            }}
+            aria-label='Limpiar selección de ciudad'
+          >
+            ✕
+          </button>
+        )}
+      </div>
+      <div className='relative w-[300px]'>
+        <Select value={localDate} onValueChange={handleDateChange}>
+          <SelectTrigger className='w-full bg-MiExpo_white'>
+            <SelectValue placeholder='Fecha' />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value='hoy'>Hoy</SelectItem>
+            <SelectItem value='manana'>Mañana</SelectItem>
+            <SelectItem value='esta-semana'>Esta semana</SelectItem>
+            <SelectItem value='este-mes'>Este mes</SelectItem>
 
-          {/* Próximos 6 meses */}
-          {getNextMonths(6).map((month) => (
-            <SelectItem key={month.value} value={month.value}>
-              {month.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+            {/* Próximos 6 meses */}
+            {getNextMonths(6).map((month) => (
+              <SelectItem key={month.value} value={month.value}>
+                {month.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        {localDate && (
+          <button
+            className='absolute right-10 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 z-10'
+            onClick={(e) => {
+              e.stopPropagation();
+              setLocalDate('');
+            }}
+            aria-label='Limpiar selección de fecha'
+          >
+            ✕
+          </button>
+        )}
+      </div>
       <Button
         className='w-[300px] bg-MiExpo_purple hover:bg-MiExpo_purple/90 text-white font-bold cursor-pointer'
         onClick={handleBuscar}

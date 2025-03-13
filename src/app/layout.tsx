@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import TopBar from '@/components/Header/TopBar';
 import { TRPCReactProvider } from '@/server/trpc/client';
+import { NuqsAdapter } from 'nuqs/adapters/next';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -30,10 +31,12 @@ export default function RootLayout({
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
-          <div className=''>
-            <TopBar />
-            {children}
-          </div>
+          <NuqsAdapter>
+            <div className=''>
+              <TopBar />
+              {children}
+            </div>
+          </NuqsAdapter>
         </body>
       </html>
     </TRPCReactProvider>
