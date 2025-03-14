@@ -37,23 +37,23 @@ function TicketPurchase({
     <div className='rounded-[20px] border border-MiExpo_gray p-6 bg-white h-full flex flex-col font-sans'>
       {/* Encabezado de la tabla */}
       <div className='grid grid-cols-3 pb-2 border-b border-MiExpo_gray'>
-        <div className='text-MiExpo_black text-[16px] font-normal leading-[100%]'>
+        <div className='text-MiExpo_black text-[12px] sm:text-[16px] font-normal leading-[100%]'>
           Tipo de Ticket
         </div>
-        <div className='text-MiExpo_black text-[16px] font-normal leading-[100%] text-center'>
+        <div className='text-MiExpo_black text-[12px] sm:text-[16px] font-normal leading-[100%] text-center'>
           Valor
         </div>
-        <div className='text-MiExpo_black text-[16px] font-normal leading-[100%] text-right'>
+        <div className='text-MiExpo_black text-[12px] sm:text-[16px] font-normal leading-[100%] text-right'>
           Cantidad
         </div>
       </div>
 
       {/* Fila de ticket */}
       <div className='grid grid-cols-3 py-4 items-center'>
-        <div className='text-MiExpo_black text-[16px] font-normal leading-[100%]'>
+        <div className='text-MiExpo_black text-[12px] sm:text-[16px] font-normal leading-[100%]'>
           {tickets[0].name}
         </div>
-        <div className='text-MiExpo_black text-[16px] font-normal leading-[100%] text-center'>
+        <div className='text-MiExpo_black text-[12px] sm:text-[16px] font-normal leading-[100%] text-center'>
           ${tickets[0].price.toLocaleString('es-AR')}
         </div>
         <div className='flex justify-end'>
@@ -75,7 +75,7 @@ function TicketPurchase({
       {/* Botón de compra */}
       <div className='mt-4 grid grid-cols-3'>
         <Button
-          className='bg-MiExpo_purple cursor-pointer col-span-1 hover:bg-MiExpo_purple/90 text-MiExpo_white font-medium text-[16px] leading-[100%] px-8 py-2 rounded-[10px]'
+          className='bg-MiExpo_purple cursor-pointer col-span-1 hover:bg-MiExpo_purple/90 text-MiExpo_white font-medium text-[12px] sm:text-[16px] leading-[100%] px-8 py-2 rounded-[10px]'
           onClick={handlePurchase}
           disabled={quantity === '0'}
         >

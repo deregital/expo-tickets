@@ -127,7 +127,7 @@ function GridEvents() {
 
   return (
     <div className='max-w-7xl mx-5 md:mx-[3rem] py-4 sm:py-8'>
-      <div className='flex flex-wrap gap-6 justify-center'>
+      <div className='flex flex-wrap gap-6 justify-between items-center'>
         {filteredEvents.map((event) => {
           const { day, month, year, time, dayOfWeek } = formatEventDate(
             event.date,
