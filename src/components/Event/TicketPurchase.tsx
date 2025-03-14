@@ -98,9 +98,7 @@ function TicketPurchase({
       <TicketPurchaseModal
         isOpen={isModalOpen}
         onClose={handleCloseModal}
-        ticketName={tickets[0].name}
         quantity={quantity}
-        price={tickets[0].price}
       />
     </div>
   );
