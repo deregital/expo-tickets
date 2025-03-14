@@ -1,6 +1,6 @@
 function MiExpo_Logo() {
   return (
-    <h1 className='text-[4rem] font-sans font-bold leading-[80px]'>
+    <h1 className='text-[1.5rem] md:text-[2.5rem] xl:text-[4rem] font-sans font-bold leading-[80px]'>
       <span className='text-MiExpo_purple'>Mi</span>
       <span className='text-white'>Expo</span>
     </h1>

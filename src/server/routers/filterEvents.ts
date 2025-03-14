@@ -1,8 +1,8 @@
-import { router, publicProcedure, handleError } from '@/server/trpc';
+import { router, ticketsProcedure, handleError } from '@/server/trpc';
 import { z } from 'zod';
 
 export const filterEventsRouter = router({
-  getCitiesByState: publicProcedure
+  getCitiesByState: ticketsProcedure
     .input(z.string())
     .query(async ({ input, ctx }) => {
       const { data, error } = await ctx.fetch.GET(
@@ -14,7 +14,7 @@ export const filterEventsRouter = router({
             },
           },
           headers: {
-            Authorization: `Bearer ${process.env.EXPO_BACKEND_TOKEN}`,
+            Authorization: `Bearer ${ctx.ticketsToken}`,
           },
         },
       );
@@ -24,10 +24,10 @@ export const filterEventsRouter = router({
       }
       return data;
     }),
-  getProvinces: publicProcedure.query(async ({ ctx }) => {
+  getProvinces: ticketsProcedure.query(async ({ ctx }) => {
     const { data, error } = await ctx.fetch.GET('/location/arg-states', {
       headers: {
-        Authorization: `Bearer ${process.env.EXPO_BACKEND_TOKEN}`,
+        Authorization: `Bearer ${ctx.ticketsToken}`,
       },
     });
     if (error) {
@@ -36,10 +36,10 @@ export const filterEventsRouter = router({
     }
     return data;
   }),
-  getEvents: publicProcedure.query(async ({ ctx }) => {
+  getEvents: ticketsProcedure.query(async ({ ctx }) => {
     const { data, error } = await ctx.fetch.GET('/event/find-active', {
       headers: {
-        Authorization: `Bearer ${process.env.EXPO_BACKEND_TOKEN}`,
+        Authorization: `Bearer ${ctx.ticketsToken}`,
       },
     });
     if (error) {

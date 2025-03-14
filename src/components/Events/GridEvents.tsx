@@ -119,15 +119,15 @@ function GridEvents() {
 
   if (!filteredEvents || filteredEvents.length === 0) {
     return (
-      <div className='max-w-7xl mx-[3rem] py-8 px-4'>
-        <h1 className='text-2xl font-bold'>No hay eventos</h1>
+      <div className='max-w-7xl mx-5 md:mx-[3rem] py-8 px-4'>
+        <h1 className='text-2xl font-bold text-center'>No hay eventos</h1>
       </div>
     );
   }
 
   return (
-    <div className='max-w-7xl mx-[3rem] py-8'>
-      <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-y-6 justify-items-center'>
+    <div className='max-w-7xl mx-5 md:mx-[3rem] py-4 sm:py-8'>
+      <div className='flex flex-wrap gap-6 justify-center'>
         {filteredEvents.map((event) => {
           const { day, month, year, time, dayOfWeek } = formatEventDate(
             event.date,

@@ -3,7 +3,7 @@ import Navbar from './Navbar';
 
 function TopBar() {
   return (
-    <div className='bg-MiExpo_black w-full h-[16vh] flex items-center pl-[50px]'>
+    <div className='bg-MiExpo_black w-full h-[16vh] flex items-center pl-[20px] md:pl-[50px]'>
       <MiExpo_Logo />
       <Navbar />
     </div>
