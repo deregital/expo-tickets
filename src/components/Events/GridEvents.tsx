@@ -4,110 +4,27 @@ import CardEvent from './CardEvent';
 import { trpc } from '@/server/trpc/client';
 import { useFilter } from '@/lib/useFilter';
 import { useEffect, useState } from 'react';
-import { type Event } from '@/types/event';
+import { type RouterOutputs } from '@/server/routers/app';
+import { useFilteredEvents } from '@/hooks/useFilteredEvents';
+
+type Event = RouterOutputs['filterEvents']['getEvents']['events'][number];
+
 function GridEvents() {
-  const search = useFilter((state) => state.search);
-  const province = useFilter((state) => state.province);
-  const city = useFilter((state) => state.city);
-  const date = useFilter((state) => state.date);
+  const { search, province, city, date } = useFilter((state) => state);
 
   const { data: eventsData, isLoading } =
     trpc.filterEvents.getEvents.useQuery();
 
-  const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
+  const [filteredEvents, setFilteredEvents] = useState<
+    RouterOutputs['filterEvents']['getEvents']['events']
+  >([]);
+
+  const filterEvents = useFilteredEvents();
 
   useEffect(() => {
-    if (!eventsData?.events) {
-      setFilteredEvents([]);
-      return;
-    }
-
-    let filtered = [...eventsData.events];
-
-    if (search) {
-      filtered = filtered.filter((event) =>
-        event.name.toLowerCase().includes(search.toLowerCase()),
-      );
-    }
-
-    if (province) {
-      filtered = filtered.filter((event) => event.location.includes(province));
-    }
-
-    if (city) {
-      filtered = filtered.filter((event) => event.location.includes(city));
-    }
-
-    if (date) {
-      const today = new Date();
-      console.log('Filtering by date:', date);
-
-      if (date === 'hoy') {
-        console.log('Filtering for today:', today.toDateString());
-        filtered = filtered.filter((event) => {
-          const eventDate = new Date(event.date);
-          return eventDate.toDateString() === today.toDateString();
-        });
-      } else if (date === 'manana') {
-        const tomorrow = new Date(today);
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        console.log('Filtering for tomorrow:', tomorrow.toDateString());
-
-        filtered = filtered.filter((event) => {
-          const eventDate = new Date(event.date);
-          return eventDate.toDateString() === tomorrow.toDateString();
-        });
-      } else if (date === 'esta-semana') {
-        const startOfWeek = new Date(today);
-        startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
-        const endOfWeek = new Date(startOfWeek);
-        endOfWeek.setDate(endOfWeek.getDate() + 6);
-        console.log(
-          'Filtering for week:',
-          startOfWeek.toDateString(),
-          'to',
-          endOfWeek.toDateString(),
-        );
-
-        filtered = filtered.filter((event) => {
-          const eventDate = new Date(event.date);
-          return eventDate >= startOfWeek && eventDate <= endOfWeek;
-        });
-      } else if (date === 'este-mes') {
-        console.log(
-          'Filtering for current month:',
-          today.getMonth() + 1,
-          today.getFullYear(),
-        );
-        filtered = filtered.filter((event) => {
-          const eventDate = new Date(event.date);
-          return (
-            eventDate.getMonth() === today.getMonth() &&
-            eventDate.getFullYear() === today.getFullYear()
-          );
-        });
-      } else if (date.includes('-')) {
-        // Format YYYY-MM for specific months
-        const [year, month] = date.split('-').map(Number);
-        console.log('Filtering for specific month:', month, year);
-
-        filtered = filtered.filter((event) => {
-          const eventDate = new Date(event.date);
-          return (
-            eventDate.getMonth() === month - 1 &&
-            eventDate.getFullYear() === year
-          );
-        });
-      }
-    }
-
-    console.log(`After filtering: ${filtered.length} events remaining`);
-    if (filtered.length > 0) {
-      console.log('Sample event:', filtered[0]);
-    }
-
+    const filtered = filterEvents(eventsData, search, province, city, date);
     setFilteredEvents(filtered);
-  }, [eventsData, search, province, city, date]);
+  }, [eventsData, search, province, city, date, filterEvents]);
 
   if (isLoading) {
     return (

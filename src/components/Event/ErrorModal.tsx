@@ -1,6 +1,6 @@
 import { X } from 'lucide-react';
 import { Dialog, DialogContent, DialogTitle } from '../ui/dialog';
-
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 interface ErrorModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -9,7 +9,9 @@ interface ErrorModalProps {
 function ErrorModal({ isOpen, onClose }: ErrorModalProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogTitle></DialogTitle>
+      <VisuallyHidden asChild>
+        <DialogTitle>Error Modal</DialogTitle>
+      </VisuallyHidden>
       <DialogContent className='bg-[#F9F9F9] rounded-[20px] p-8 max-w-md mx-auto text-center border-none'>
         {/* Ícono de check */}
         <div className='flex justify-center mb-8'>

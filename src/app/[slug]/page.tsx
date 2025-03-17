@@ -1,4 +1,3 @@
-import { notFound } from 'next/navigation';
 import { trpc } from '@/server/trpc/server';
 import { MapPin } from 'lucide-react';
 import HeaderTickets from '@/components/Event/HeaderTickets';
@@ -12,12 +11,16 @@ interface EventPageProps {
 }
 
 async function EventPage({ params }: EventPageProps) {
-  const { events } = await trpc.filterEvents.getEvents();
+  const event = await trpc.filterEvents.getEventById(params.slug);
 
-  const event = events.find((event) => event.id === params.slug);
+  //const event = events.find((event) => event.id === params.slug);
 
   if (!event) {
-    notFound();
+    return (
+      <div className='max-w-7xl mx-5 md:mx-[3rem] py-8 px-4'>
+        <h1 className='text-2xl font-bold text-center'>Evento no encontrado</h1>
+      </div>
+    );
   }
 
   return (
@@ -33,7 +36,7 @@ async function EventPage({ params }: EventPageProps) {
           {/* Segunda parte - Compra de entradas */}
           <div className='row-span-4 grid grid-cols-16 border-MiExpo_gray overflow-hidden mt-6'>
             <div className='col-span-12 px-6 pb-4 overflow-hidden'>
-              <TicketPurchase />
+              <TicketPurchase eventTickets={event.eventTickets} />
             </div>
 
             <div className='col-span-4 px-4 flex flex-col justify-start items-center overflow-hidden'>
@@ -87,7 +90,7 @@ async function EventPage({ params }: EventPageProps) {
 
           {/* Sección de compra de tickets */}
           <div className='p-4'>
-            <TicketPurchase />
+            <TicketPurchase eventTickets={event.eventTickets} />
           </div>
 
           {/* Información del evento */}

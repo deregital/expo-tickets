@@ -100,7 +100,6 @@ const ticketsAuthMiddleware = t.middleware(async ({ ctx, next }) => {
       ctx: {
         ...ctx,
         fetch: fetchClient,
-        ticketsToken: token,
       },
     });
   } catch (error) {

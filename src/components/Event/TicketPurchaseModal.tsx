@@ -34,26 +34,12 @@ function TicketPurchaseModal({
     additionalTickets: Array(Math.max(0, ticketsCount - 1)).fill(''),
   });
 
-  const [errors, setErrors] = useState({
-    nombre: false,
-    apellido: false,
-    email: false,
-    additionalTickets: Array(Math.max(0, ticketsCount - 1)).fill(false),
-  });
-
   useEffect(() => {
     setFormData({
       nombre: '',
       apellido: '',
       email: '',
       additionalTickets: Array(Math.max(0, ticketsCount - 1)).fill(''),
-    });
-
-    setErrors({
-      nombre: false,
-      apellido: false,
-      email: false,
-      additionalTickets: Array(Math.max(0, ticketsCount - 1)).fill(false),
     });
   }, [ticketsCount]);
 
@@ -65,13 +51,6 @@ function TicketPurchaseModal({
         email: '',
         additionalTickets: Array(Math.max(0, ticketsCount - 1)).fill(''),
       });
-
-      setErrors({
-        nombre: false,
-        apellido: false,
-        email: false,
-        additionalTickets: Array(Math.max(0, ticketsCount - 1)).fill(false),
-      });
     }
   }, [isOpen, ticketsCount]);
 
@@ -80,12 +59,6 @@ function TicketPurchaseModal({
       ...formData,
       [e.target.name]: e.target.value,
     });
-    if (e.target.value) {
-      setErrors({
-        ...errors,
-        [e.target.name]: false,
-      });
-    }
   };
 
   const handleAdditionalTicketChange = (index: number, value: string) => {
@@ -96,43 +69,11 @@ function TicketPurchaseModal({
       ...formData,
       additionalTickets: newAdditionalTickets,
     });
-
-    if (value) {
-      const newErrors = { ...errors };
-      newErrors.additionalTickets[index] = false;
-      setErrors(newErrors);
-    }
-  };
-
-  const isValidEmail = (email: string) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
   };
 
   const handleSubmit = async () => {
-    const newErrors = {
-      nombre: formData.nombre.trim().length < 1,
-      apellido: formData.apellido.trim().length < 1,
-      email: !formData.email || !isValidEmail(formData.email),
-      additionalTickets: formData.additionalTickets.map(
-        (ticket) => ticket.trim().length < 1,
-      ),
-    };
-
-    setErrors(newErrors);
-
-    const hasMainErrors =
-      newErrors.nombre || newErrors.apellido || newErrors.email;
-    const hasAdditionalErrors = newErrors.additionalTickets.some(
-      (error) => error,
-    );
-
-    if (!hasMainErrors && !hasAdditionalErrors) {
-      onClose();
-      setShowSuccessModal(true);
-    } else {
-      setShowErrorModal(true);
-    }
+    onClose();
+    setShowSuccessModal(true);
   };
 
   const handleSuccessModalClose = () => {
@@ -167,11 +108,6 @@ function TicketPurchaseModal({
                 onChange={handleChange}
                 className='w-full h-10 bg-MiExpo_white border-none rounded-none focus:ring-0 focus:outline-none focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none px-4'
               />
-              {errors.nombre && (
-                <p className='text-red-500 text-xs my-1 ml-1'>
-                  El nombre debe tener al menos 2 caracteres
-                </p>
-              )}
             </div>
             <div className='rounded-[10px] border border-MiExpo_gray overflow-hidden'>
               <div className='py-2 bg-white'>
@@ -186,11 +122,6 @@ function TicketPurchaseModal({
                 onChange={handleChange}
                 className='w-full h-10 bg-MiExpo_white border-none rounded-none focus:ring-0 focus:outline-none focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none px-4'
               />
-              {errors.apellido && (
-                <p className='text-red-500 text-xs my-1 ml-1'>
-                  El apellido debe tener al menos 2 caracteres
-                </p>
-              )}
             </div>
 
             <div className='rounded-[10px] border border-MiExpo_gray overflow-hidden'>
@@ -207,11 +138,6 @@ function TicketPurchaseModal({
                 onChange={handleChange}
                 className='w-full h-10 bg-MiExpo_white border-none rounded-none focus:ring-0 focus:outline-none focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none px-4'
               />
-              {errors.email && (
-                <p className='text-red-500 text-xs my-1 ml-1'>
-                  Ingrese un email válido
-                </p>
-              )}
             </div>
 
             {/* Tickets adicionales */}
@@ -233,14 +159,8 @@ function TicketPurchaseModal({
                       onChange={(e) =>
                         handleAdditionalTicketChange(index, e.target.value)
                       }
-                      className={`w-full h-10 bg-MiExpo_white border-none rounded-none focus:ring-0 focus:outline-none focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none px-4 ${errors.additionalTickets[index] ? 'border-red-500' : 'border-MiExpo_gray'}`}
+                      className={`w-full h-10 bg-MiExpo_white border-none rounded-none focus:ring-0 focus:outline-none focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none px-4`}
                     />
-                    {errors.additionalTickets[index] && (
-                      <p className='text-red-500 text-xs my-1 ml-1'>
-                        Ingrese un nombre y apellido válidos (mínimo 3
-                        caracteres)
-                      </p>
-                    )}
                   </div>
                 ))}
               </>

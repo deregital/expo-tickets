@@ -9,19 +9,15 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import TicketPurchaseModal from './TicketPurchaseModal';
-
-interface TicketPurchaseProps {
-  tickets?: {
-    id: string;
-    name: string;
-    price: number;
-  }[];
-}
+import { type RouterOutputs } from '@/server/routers/app';
+import { TICKET_INFORMATION } from '@/constants';
 
 function TicketPurchase({
-  tickets = [{ id: '1', name: 'TICKET GENERAL LOTE 01', price: 5000 }],
-}: TicketPurchaseProps) {
-  const [quantity, setQuantity] = useState('0');
+  eventTickets,
+}: {
+  eventTickets: RouterOutputs['filterEvents']['getEvents']['events'][number]['eventTickets'];
+}) {
+  const [quantity, setQuantity] = useState('1');
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handlePurchase = () => {
@@ -51,18 +47,18 @@ function TicketPurchase({
       {/* Fila de ticket */}
       <div className='grid grid-cols-3 py-4 items-center'>
         <div className='text-MiExpo_black text-[12px] sm:text-[16px] font-normal leading-[100%]'>
-          {tickets[0].name}
+          {TICKET_INFORMATION.name}
         </div>
         <div className='text-MiExpo_black text-[12px] sm:text-[16px] font-normal leading-[100%] text-center'>
-          ${tickets[0].price.toLocaleString('es-AR')}
+          ${eventTickets?.[0]?.price?.toLocaleString('es-AR')}
         </div>
         <div className='flex justify-end'>
           <Select value={quantity} onValueChange={setQuantity}>
             <SelectTrigger className='w-24 bg-white text-MiExpo_black border border-MiExpo_gray'>
-              <SelectValue placeholder='0' />
+              <SelectValue placeholder='1' />
             </SelectTrigger>
             <SelectContent>
-              {[0, 1, 2, 3, 4, 5].map((num) => (
+              {[1, 2, 3, 4, 5].map((num) => (
                 <SelectItem key={num} value={num.toString()}>
                   {num}
                 </SelectItem>

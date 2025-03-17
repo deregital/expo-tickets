@@ -1,7 +1,8 @@
 'use client';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { Check } from 'lucide-react';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 interface BuyTicketsModalProps {
   isOpen: boolean;
@@ -9,9 +10,12 @@ interface BuyTicketsModalProps {
 }
 
 function BuyTicketsModal({ isOpen, onClose }: BuyTicketsModalProps) {
+  const router = useRouter();
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogTitle></DialogTitle>
+      <VisuallyHidden asChild>
+        <DialogTitle>Compra de entradas</DialogTitle>
+      </VisuallyHidden>
       <DialogContent className='bg-[#F9F9F9] rounded-[20px] p-8 max-w-md mx-auto text-center border-none'>
         {/* Ícono de check */}
         <div className='flex justify-center mb-8'>
@@ -28,12 +32,12 @@ function BuyTicketsModal({ isOpen, onClose }: BuyTicketsModalProps) {
         {/* Instrucciones */}
         <p className='text-lg text-black mb-4'>
           Podés visualizar tu entrada en tu mail o descargarla clickeando{' '}
-          <Link
-            href={`/tickets`}
-            className='text-black font-bold underline hover:cursor-pointer'
+          <button
+            onClick={() => router.push('/tickets')}
+            className='text-black font-bold underline hover:cursor-pointer bg-transparent border-none p-0 m-0'
           >
             ACÁ
-          </Link>
+          </button>
         </p>
       </DialogContent>
     </Dialog>

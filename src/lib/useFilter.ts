@@ -57,9 +57,7 @@ export const useFilter = create<FilterState>((set) => ({
 }));
 
 export function useLocationData() {
-  const setProvinces = useFilter((state) => state.setProvinces);
-  const setCities = useFilter((state) => state.setCities);
-  const province = useFilter((state) => state.province);
+  const { setProvinces, setCities, province } = useFilter((state) => state);
 
   // Load provinces
   const { data: provincesData } = trpc.filterEvents.getProvinces.useQuery();

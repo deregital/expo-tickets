@@ -13,9 +13,6 @@ export const filterEventsRouter = router({
               argState: input,
             },
           },
-          headers: {
-            Authorization: `Bearer ${ctx.ticketsToken}`,
-          },
         },
       );
       if (error) {
@@ -25,11 +22,7 @@ export const filterEventsRouter = router({
       return data;
     }),
   getProvinces: ticketsProcedure.query(async ({ ctx }) => {
-    const { data, error } = await ctx.fetch.GET('/location/arg-states', {
-      headers: {
-        Authorization: `Bearer ${ctx.ticketsToken}`,
-      },
-    });
+    const { data, error } = await ctx.fetch.GET('/location/arg-states');
     if (error) {
       console.log(error);
       throw handleError(error);
@@ -37,15 +30,24 @@ export const filterEventsRouter = router({
     return data;
   }),
   getEvents: ticketsProcedure.query(async ({ ctx }) => {
-    const { data, error } = await ctx.fetch.GET('/event/find-active', {
-      headers: {
-        Authorization: `Bearer ${ctx.ticketsToken}`,
-      },
-    });
+    const { data, error } = await ctx.fetch.GET('/event/find-active');
     if (error) {
       console.log(error);
       throw handleError(error);
     }
     return data;
   }),
+  getEventById: ticketsProcedure
+    .input(z.string())
+    .query(async ({ input, ctx }) => {
+      const { data, error } = await ctx.fetch.GET(`/event/{id}`, {
+        params: {
+          path: {
+            id: input,
+          },
+        },
+      });
+      if (error) throw handleError(error);
+      return data;
+    }),
 });

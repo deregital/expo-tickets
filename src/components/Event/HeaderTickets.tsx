@@ -1,54 +1,23 @@
 import { MapPin } from 'lucide-react';
-import { type Event } from '@/types/event';
+import { type RouterOutputs } from '@/server/routers/app';
+import { format } from 'date-fns';
+import { es } from 'date-fns/locale';
 
-function HeaderTickets({ event }: { event: Event }) {
+function HeaderTickets({
+  event,
+}: {
+  event: RouterOutputs['filterEvents']['getEvents']['events'][number];
+}) {
   // Formatear la fecha para mostrarla en español
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-
-    // Obtener el día de la semana
-    const weekdays = [
-      'Domingo',
-      'Lunes',
-      'Martes',
-      'Miércoles',
-      'Jueves',
-      'Viernes',
-      'Sábado',
-    ];
-    const dayOfWeek = weekdays[date.getDay()];
-
-    // Obtener el día del mes
-    const day = date.getDate();
-
-    // Obtener el mes
-    const months = [
-      'enero',
-      'febrero',
-      'marzo',
-      'abril',
-      'mayo',
-      'junio',
-      'julio',
-      'agosto',
-      'septiembre',
-      'octubre',
-      'noviembre',
-      'diciembre',
-    ];
-    const month = months[date.getMonth()];
-
-    // Obtener el año
-    const year = date.getFullYear();
-
-    // Formatear la fecha como "Domingo 15 de junio 2025"
-    return `${dayOfWeek} ${day} de ${month} ${year}`;
+    return format(date, "EEEE d 'de' MMMM yyyy", { locale: es });
   };
 
   // Formatear la hora
   const formatTime = (dateString: string) => {
     const date = new Date(dateString);
-    return `${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')} hrs.`;
+    return format(date, "HH:mm 'hrs.'", { locale: es });
   };
 
   const formattedDate = formatDate(event.date);

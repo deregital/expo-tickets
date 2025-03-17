@@ -1,21 +1,5 @@
 import { fetchClient } from '@/server/fetchClient';
-
-interface LoginResponse {
-  user: {
-    id: string;
-    username: string;
-    role: 'USER' | 'ADMIN' | 'FORM' | 'TICKETS';
-    isGlobalFilterActive: boolean;
-    fcmToken: string[];
-    created_at: string;
-    updated_at: string;
-  };
-  backendTokens: {
-    accessToken: string;
-    refreshToken: string;
-    expiresIn: number;
-  };
-}
+import { type LoginResponseDto } from 'expo-backend-types';
 
 interface TokenInfo {
   token: string;
@@ -52,9 +36,14 @@ async function login(): Promise<string> {
     throw new Error(`Error de autenticación: ${error.message}`);
   }
 
-  const response = data as LoginResponse;
+  const response = data as LoginResponseDto;
   const token = response.backendTokens.accessToken;
-
+  fetchClient.use({
+    onRequest: ({ request }) => {
+      request.headers.set('Authorization', `Bearer ${token}`);
+      return request;
+    },
+  });
   tokenCache = {
     token,
     expiresAt: response.backendTokens.expiresIn,
