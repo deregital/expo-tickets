@@ -1,9 +1,14 @@
+import GridEvents from '@/components/Events/GridEvents';
+import Filter from '@/components/Filter/FilterEvents';
+import { Suspense } from 'react';
+
 export default function Home() {
   return (
-    <div className='grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]'>
-      <main className='flex flex-col gap-8 row-start-2 items-center sm:items-start'>
-        <h1 className='text-6xl font-bold'>EXPO TICKETS</h1>
-      </main>
+    <div className='bg-MiExpo_white h-screen flex flex-col gap-4'>
+      <Suspense>
+        <Filter />
+        <GridEvents />
+      </Suspense>
     </div>
   );
 }
