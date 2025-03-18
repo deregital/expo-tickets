@@ -3,11 +3,7 @@ import { formatEventDate } from '@/lib/utils';
 import CardEvent from './CardEvent';
 import { trpc } from '@/server/trpc/client';
 import { useFilter } from '@/lib/useFilter';
-import { useEffect, useState } from 'react';
-import { type RouterOutputs } from '@/server/routers/app';
 import { useFilteredEvents } from '@/hooks/useFilteredEvents';
-
-type Event = RouterOutputs['filterEvents']['getEvents']['events'][number];
 
 function GridEvents() {
   const { search, province, city, date } = useFilter((state) => state);
@@ -15,16 +11,13 @@ function GridEvents() {
   const { data: eventsData, isLoading } =
     trpc.filterEvents.getEvents.useQuery();
 
-  const [filteredEvents, setFilteredEvents] = useState<
-    RouterOutputs['filterEvents']['getEvents']['events']
-  >([]);
-
-  const filterEvents = useFilteredEvents();
-
-  useEffect(() => {
-    const filtered = filterEvents(eventsData, search, province, city, date);
-    setFilteredEvents(filtered);
-  }, [eventsData, search, province, city, date]);
+  const filteredEvents = useFilteredEvents(
+    eventsData,
+    search,
+    province,
+    city,
+    date,
+  );
 
   if (isLoading) {
     return (
@@ -43,11 +36,11 @@ function GridEvents() {
   }
 
   return (
-    <div className='max-w-7xl mx-5 md:mx-[3rem] py-4 sm:py-8'>
-      <div className='flex flex-wrap gap-6 justify-between items-center'>
+    <div className='max-w-full mx-5 md:mx-[3rem] py-4 sm:py-8'>
+      <div className='flex flex-wrap gap-6 items-center'>
         {filteredEvents.map((event) => {
           const { day, month, year, time, dayOfWeek } = formatEventDate(
-            event.date,
+            event.startingDate,
           );
 
           return (
