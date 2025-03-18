@@ -1,4 +1,3 @@
-'use client';
 import { trpc } from '@/server/trpc/client';
 import { useEffect, useState } from 'react';
 import { useQueryState } from 'nuqs';

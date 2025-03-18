@@ -28,7 +28,7 @@ function GridEvents() {
 
   if (!filteredEvents || filteredEvents.length === 0) {
     return (
-      <div className='max-w-7xl mx-5 md:mx-[3rem] py-8 px-4'>
+      <div className='max-w-full mx-5 md:mx-[3rem] py-8 px-4'>
         <h1 className='text-2xl font-bold text-center'>No hay eventos</h1>
       </div>
     );
