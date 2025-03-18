@@ -2,21 +2,21 @@
 import { formatEventDate } from '@/lib/utils';
 import CardEvent from './CardEvent';
 import { trpc } from '@/server/trpc/client';
-import { useFilter } from '@/lib/useFilter';
+import { useParamsFilter } from '@/lib/useFilter';
 import { useFilteredEvents } from '@/hooks/useFilteredEvents';
 
 function GridEvents() {
-  const { search, province, city, date } = useFilter((state) => state);
+  const { search, province, city, date } = useParamsFilter();
 
   const { data: eventsData, isLoading } =
     trpc.filterEvents.getEvents.useQuery();
 
   const filteredEvents = useFilteredEvents(
     eventsData,
-    search,
-    province,
-    city,
-    date,
+    search || '',
+    province || '',
+    city || '',
+    date || '',
   );
 
   if (isLoading) {

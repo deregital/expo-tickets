@@ -1,7 +1,8 @@
 'use client';
-import { create } from 'zustand';
 import { trpc } from '@/server/trpc/client';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { useQueryState } from 'nuqs';
+import { create } from 'zustand';
 
 // Define types
 interface CityData {
@@ -12,24 +13,56 @@ interface CityData {
 
 interface FilterState {
   // State
-  search: string;
-  province: string;
-  city: string;
-  date: string;
+  search: string | null;
+  province: string | null;
+  city: string | null;
+  date: string | null;
   provinces: string[];
   cities: CityData[];
 
   // Actions
-  setSearch: (search: string) => void;
-  setProvince: (province: string) => void;
-  setCity: (city: string) => void;
-  setDate: (date: string) => void;
+  setSearch: (search: string | null) => void;
+  setProvince: (province: string | null) => void;
+  setCity: (city: string | null) => void;
+  setDate: (date: string | null) => void;
   setProvinces: (provinces: string[]) => void;
   setCities: (cities: CityData[]) => void;
   resetFilters: () => void;
 }
 
-export const useFilter = create<FilterState>((set) => ({
+export function useParamsFilter(): FilterState {
+  const [search, setSearch] = useQueryState('search');
+  const [province, setProvince] = useQueryState('province');
+  const [city, setCity] = useQueryState('city');
+  const [date, setDate] = useQueryState('date');
+  const [provinces, setProvinces] = useState<string[]>([]);
+  const [cities, setCities] = useState<CityData[]>([]);
+
+  function resetFilters() {
+    setSearch(null);
+    setProvince(null);
+    setCity(null);
+    setDate(null);
+  }
+
+  return {
+    search,
+    province,
+    city,
+    date,
+    setSearch,
+    setProvince,
+    setCity,
+    setDate,
+    provinces,
+    cities,
+    setProvinces,
+    setCities,
+    resetFilters,
+  };
+}
+
+export const useLocalFilter = create<FilterState>((set) => ({
   search: '',
   province: '',
   city: '',
@@ -38,11 +71,7 @@ export const useFilter = create<FilterState>((set) => ({
   cities: [],
 
   setSearch: (search) => set({ search }),
-  setProvince: (province) =>
-    set((state) => ({
-      province,
-      city: province === '' ? '' : state.city,
-    })),
+  setProvince: (province) => set({ province }),
   setCity: (city) => set({ city }),
   setDate: (date) => set({ date }),
   setProvinces: (provinces) => set({ provinces }),
@@ -57,11 +86,7 @@ export const useFilter = create<FilterState>((set) => ({
 }));
 
 export function useLocationData() {
-  const { setProvinces, setCities, province } = useFilter((state) => ({
-    setProvinces: state.setProvinces,
-    setCities: state.setCities,
-    province: state.province,
-  }));
+  const { setProvinces, setCities, province } = useParamsFilter();
 
   // Load provinces
   const { data: provincesData, isSuccess: isProvincesSuccess } =
@@ -69,15 +94,15 @@ export function useLocationData() {
 
   // Load cities when province changes
   const { data: citiesData, isSuccess: isCitiesSuccess } =
-    trpc.filterEvents.getCitiesByState.useQuery(province, {
-      enabled: province !== '',
+    trpc.filterEvents.getCitiesByState.useQuery(province!, {
+      enabled: province !== null,
     });
 
   useEffect(() => {
     if (provincesData?.states) {
       setProvinces(provincesData.states);
     }
-  }, [isProvincesSuccess]);
+  }, [isProvincesSuccess, provincesData?.states, setProvinces]);
 
   useEffect(() => {
     if (citiesData?.cities) {
@@ -85,5 +110,5 @@ export function useLocationData() {
     } else {
       setCities([]);
     }
-  }, [isCitiesSuccess]);
+  }, [citiesData?.cities, isCitiesSuccess, setCities]);
 }
