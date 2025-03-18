@@ -7,10 +7,17 @@ type EventsData = RouterOutputs['filterEvents']['getEvents'] | undefined;
 
 export function useFilteredEvents(
   eventsData: EventsData,
-  search: string,
-  province: string,
-  city: string,
-  date: string,
+  {
+    search,
+    province,
+    city,
+    date,
+  }: {
+    search: string;
+    province: string;
+    city: string;
+    date: string;
+  },
 ): Events {
   if (!eventsData?.events) return [];
 
@@ -18,8 +25,8 @@ export function useFilteredEvents(
     search: (event: Event) =>
       search ? event.name.toLowerCase().includes(search.toLowerCase()) : true,
     province: (event: Event) =>
-      province ? event.location.includes(province) : true,
-    city: (event: Event) => (city ? event.location.includes(city) : true),
+      province ? event.location.includes(province) : true, // TODO: Fix this when we have provinces and googleMaps
+    city: (event: Event) => (city ? event.location.includes(city) : true), // TODO: Fix this when we have provinces and googleMaps
     date: (event: Event) => (date ? filterByDate(event.date, date) : true),
   };
 

@@ -15,12 +15,12 @@ interface CardEventProps {
 
 function CardEvent({
   id,
-  title = 'Expo Entrenamiento 2',
-  dayOfWeek = 'Dom',
-  date = '16',
-  month = 'Mar',
-  year = '2025',
-  time = '15:00',
+  title,
+  dayOfWeek,
+  date,
+  month,
+  year,
+  time,
   imageUrl = '/Foto.png',
 }: CardEventProps) {
   return (

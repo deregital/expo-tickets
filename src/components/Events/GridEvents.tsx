@@ -11,13 +11,12 @@ function GridEvents() {
   const { data: eventsData, isLoading } =
     trpc.filterEvents.getEvents.useQuery();
 
-  const filteredEvents = useFilteredEvents(
-    eventsData,
-    search || '',
-    province || '',
-    city || '',
-    date || '',
-  );
+  const filteredEvents = useFilteredEvents(eventsData, {
+    search: search || '',
+    province: province || '',
+    city: city || '',
+    date: date || '',
+  });
 
   if (isLoading) {
     return (
