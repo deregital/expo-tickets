@@ -24,7 +24,7 @@ function GridEvents() {
   useEffect(() => {
     const filtered = filterEvents(eventsData, search, province, city, date);
     setFilteredEvents(filtered);
-  }, [eventsData, search, province, city, date, filterEvents]);
+  }, [eventsData, search, province, city, date]);
 
   if (isLoading) {
     return (

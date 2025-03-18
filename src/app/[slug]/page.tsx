@@ -5,15 +5,14 @@ import InformationEvent from '@/components/Event/InformationEvent';
 import TicketPurchase from '@/components/Event/TicketPurchase';
 
 interface EventPageProps {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 }
 
 async function EventPage({ params }: EventPageProps) {
-  const event = await trpc.filterEvents.getEventById(params.slug);
-
-  //const event = events.find((event) => event.id === params.slug);
+  const resolvedParams = await params;
+  const event = await trpc.filterEvents.getEventById(resolvedParams.slug);
 
   if (!event) {
     return (
