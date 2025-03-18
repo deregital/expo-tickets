@@ -64,19 +64,20 @@ export function useLocationData() {
   }));
 
   // Load provinces
-  const { data: provincesData } = trpc.filterEvents.getProvinces.useQuery();
+  const { data: provincesData, isSuccess: isProvincesSuccess } =
+    trpc.filterEvents.getProvinces.useQuery();
 
   // Load cities when province changes
-  const { data: citiesData } = trpc.filterEvents.getCitiesByState.useQuery(
-    province,
-    { enabled: province !== '' },
-  );
+  const { data: citiesData, isSuccess: isCitiesSuccess } =
+    trpc.filterEvents.getCitiesByState.useQuery(province, {
+      enabled: province !== '',
+    });
 
   useEffect(() => {
     if (provincesData?.states) {
       setProvinces(provincesData.states);
     }
-  }, [provincesData, setProvinces]);
+  }, [isProvincesSuccess]);
 
   useEffect(() => {
     if (citiesData?.cities) {
@@ -84,5 +85,5 @@ export function useLocationData() {
     } else {
       setCities([]);
     }
-  }, [citiesData, setCities]);
+  }, [isCitiesSuccess]);
 }
