@@ -1,10 +1,10 @@
 import { handleError, router, ticketsProcedure } from '@/server/trpc';
 import { z } from 'zod';
-import { createTicketResponseSchema } from 'expo-backend-types';
+import { createTicketSchema } from 'expo-backend-types';
 
 export const ticketsRouter = router({
   createMany: ticketsProcedure
-    .input(z.array(createTicketResponseSchema))
+    .input(z.array(createTicketSchema))
     .mutation(async ({ ctx, input }) => {
       const { data, error } = await ctx.fetch.POST('/ticket/create-many', {
         body: input,
