@@ -1,16 +1,53 @@
 'use client';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
-import { Check } from 'lucide-react';
+import { Check, Download } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { type RouterOutputs } from '@/server/routers/app';
 
 interface BuyTicketsModalProps {
   isOpen: boolean;
   onClose: () => void;
+  pdfs?: RouterOutputs['tickets']['createMany']['pdfs'];
 }
 
-function BuyTicketsModal({ isOpen, onClose }: BuyTicketsModalProps) {
+function BuyTicketsModal({ isOpen, onClose, pdfs }: BuyTicketsModalProps) {
   const router = useRouter();
+
+  const downloadPdf = (pdfBase64: string, ticketId: string) => {
+    try {
+      const byteCharacters = atob(pdfBase64);
+      const byteNumbers = new Array(byteCharacters.length);
+
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([byteArray], { type: 'application/pdf' });
+
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `ticket-${ticketId}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+
+      document.body.removeChild(link);
+      URL.revokeObjectURL(link.href);
+    } catch (error) {
+      console.error('Error downloading PDF:', error);
+    }
+  };
+
+  const downloadAllPdfs = () => {
+    if (pdfs && pdfs.length > 0) {
+      pdfs.forEach((pdf) => {
+        downloadPdf(pdf.pdfBase64, pdf.ticketId);
+      });
+    }
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <VisuallyHidden asChild>
@@ -39,6 +76,46 @@ function BuyTicketsModal({ isOpen, onClose }: BuyTicketsModalProps) {
             ACÁ
           </button>
         </p>
+
+        {pdfs && pdfs.length > 0 && (
+          <div className='mt-6 space-y-4'>
+            <h3 className='text-lg font-semibold text-black'>
+              Descargar Tickets
+            </h3>
+
+            {pdfs.length > 1 ? (
+              <>
+                <div className='grid grid-cols-1 gap-2'>
+                  {pdfs.map((pdf, index) => (
+                    <Button
+                      key={pdf.ticketId}
+                      onClick={() => downloadPdf(pdf.pdfBase64, pdf.ticketId)}
+                      className='flex items-center justify-center gap-2 bg-MiExpo_purple hover:bg-MiExpo_purple/90 text-white'
+                    >
+                      <Download className='w-4 h-4' />
+                      <span>Descargar Ticket {index + 1}</span>
+                    </Button>
+                  ))}
+                </div>
+                <Button
+                  onClick={downloadAllPdfs}
+                  className='w-full flex items-center justify-center gap-2 bg-black hover:bg-black/80 text-white mt-2'
+                >
+                  <Download className='w-4 h-4' />
+                  <span>Descargar Todos los Tickets</span>
+                </Button>
+              </>
+            ) : (
+              <Button
+                onClick={() => downloadPdf(pdfs[0].pdfBase64, pdfs[0].ticketId)}
+                className='w-full flex items-center justify-center gap-2 bg-MiExpo_purple hover:bg-MiExpo_purple/90 text-white'
+              >
+                <Download className='w-4 h-4' />
+                <span>Descargar Ticket</span>
+              </Button>
+            )}
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   );

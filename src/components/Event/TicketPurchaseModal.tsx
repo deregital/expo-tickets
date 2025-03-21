@@ -10,20 +10,45 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import BuyTicketsModal from './BuyTicketsModal';
 import ErrorModal from './ErrorModal';
+import { trpc } from '@/server/trpc/client';
 
 interface TicketPurchaseModalProps {
   isOpen: boolean;
   onClose: () => void;
   quantity: string;
+  price: number;
+  eventId: string;
+  ticketType: 'PARTICIPANT' | 'STAFF' | 'SPECTATOR';
 }
+
+// Define the PDF data type based on the API response
+type PdfData = {
+  ticketId: string;
+  pdfBase64: string;
+}[];
 
 function TicketPurchaseModal({
   isOpen,
   onClose,
   quantity,
+  price,
+  ticketType,
+  eventId,
 }: TicketPurchaseModalProps) {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
+  const [pdfData, setPdfData] = useState<PdfData>([]);
+
+  const createManyTickets = trpc.tickets.createMany.useMutation({
+    onSuccess: (data) => {
+      if (data?.pdfs) {
+        setPdfData(data.pdfs);
+      }
+    },
+    onError: (error) => {
+      setShowErrorModal(true);
+    },
+  });
 
   const ticketsCount = parseInt(quantity, 10);
 
@@ -72,8 +97,44 @@ function TicketPurchaseModal({
   };
 
   const handleSubmit = async () => {
-    onClose();
-    setShowSuccessModal(true);
+    if (price === 0) {
+      onClose();
+      try {
+        if (quantity === '1') {
+          await createManyTickets.mutateAsync([
+            {
+              status: 'FREE' as const,
+              eventId: eventId,
+              type: ticketType,
+              fullName: formData.nombre + ' ' + formData.apellido,
+              mail: formData.email,
+            },
+          ]);
+        } else {
+          await createManyTickets.mutateAsync([
+            {
+              status: 'FREE' as const,
+              eventId: eventId,
+              type: ticketType,
+              fullName: formData.nombre + ' ' + formData.apellido,
+              mail: formData.email,
+            },
+            ...formData.additionalTickets.map((ticket) => ({
+              status: 'FREE' as const,
+              eventId: eventId,
+              type: ticketType,
+              fullName: ticket,
+              mail: formData.email,
+            })),
+          ]);
+        }
+        setShowSuccessModal(true);
+      } catch (error) {
+        setShowErrorModal(true);
+      }
+    } else {
+      setShowErrorModal(true);
+    }
   };
 
   const handleSuccessModalClose = () => {
@@ -179,6 +240,7 @@ function TicketPurchaseModal({
       <BuyTicketsModal
         isOpen={showSuccessModal}
         onClose={handleSuccessModalClose}
+        pdfs={pdfData}
       />
       <ErrorModal isOpen={showErrorModal} onClose={handleErrorModalClose} />
     </>

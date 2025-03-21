@@ -14,8 +14,10 @@ import { TICKET_INFORMATION } from '@/constants';
 
 function TicketPurchase({
   eventTickets,
+  eventId,
 }: {
   eventTickets: RouterOutputs['filterEvents']['getEvents']['events'][number]['eventTickets'];
+  eventId: string;
 }) {
   const [quantity, setQuantity] = useState('1');
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -50,7 +52,7 @@ function TicketPurchase({
           {TICKET_INFORMATION.name}
         </div>
         <div className='text-MiExpo_black text-[12px] sm:text-[16px] font-normal leading-[100%] text-center'>
-          ${eventTickets?.[0]?.price?.toLocaleString('es-AR')}
+          ${eventTickets?.[0]?.price ? eventTickets[0].price : 0}
         </div>
         <div className='flex justify-end'>
           <Select value={quantity} onValueChange={setQuantity}>
@@ -95,6 +97,9 @@ function TicketPurchase({
         isOpen={isModalOpen}
         onClose={handleCloseModal}
         quantity={quantity}
+        price={eventTickets?.[0]?.price ? eventTickets[0].price : 0}
+        eventId={eventId}
+        ticketType={eventTickets?.[0]?.type}
       />
     </div>
   );
