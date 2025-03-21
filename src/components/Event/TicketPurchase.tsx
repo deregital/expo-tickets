@@ -99,7 +99,7 @@ function TicketPurchase({
         quantity={quantity}
         price={eventTickets?.[0]?.price ? eventTickets[0].price : 0}
         eventId={eventId}
-        ticketType={eventTickets?.[0]?.type}
+        ticketType={eventTickets?.[0]?.type || 'PARTICIPANT'}
       />
     </div>
   );

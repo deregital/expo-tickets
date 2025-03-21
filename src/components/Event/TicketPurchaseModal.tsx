@@ -43,6 +43,8 @@ function TicketPurchaseModal({
     onSuccess: (data) => {
       if (data?.pdfs) {
         setPdfData(data.pdfs);
+        setShowSuccessModal(true);
+        onClose();
       }
     },
     onError: (error) => {
@@ -98,7 +100,6 @@ function TicketPurchaseModal({
 
   const handleSubmit = async () => {
     if (price === 0) {
-      onClose();
       try {
         if (quantity === '1') {
           await createManyTickets.mutateAsync([
@@ -128,7 +129,6 @@ function TicketPurchaseModal({
             })),
           ]);
         }
-        setShowSuccessModal(true);
       } catch (error) {
         setShowErrorModal(true);
       }

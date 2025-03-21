@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -21,7 +21,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
-    "expo-backend-types": "^0.36.0-EXPO-325-ExpoBackend-Emision-de-multiples-tickets.5",
+    "expo-backend-types": "^0.36.0-EXPO-325-ExpoBackend-Emision-de-multiples-tickets.8",
     "lucide-react": "^0.477.0",
     "next": "15.2.1",
     "nuqs": "^2.4.1",

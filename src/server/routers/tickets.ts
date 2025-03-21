@@ -7,7 +7,9 @@ export const ticketsRouter = router({
     .input(z.array(createTicketSchema))
     .mutation(async ({ ctx, input }) => {
       const { data, error } = await ctx.fetch.POST('/ticket/create-many', {
-        body: input,
+        body: {
+          tickets: input,
+        },
       });
       if (error) {
         throw handleError(error);

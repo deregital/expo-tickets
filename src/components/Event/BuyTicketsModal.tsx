@@ -68,19 +68,13 @@ function BuyTicketsModal({ isOpen, onClose, pdfs }: BuyTicketsModalProps) {
 
         {/* Instrucciones */}
         <p className='text-lg text-black mb-4'>
-          Podés visualizar tu entrada en tu mail o descargarla clickeando{' '}
-          <button
-            onClick={() => router.push('/tickets')}
-            className='text-black font-bold underline hover:cursor-pointer bg-transparent border-none p-0 m-0'
-          >
-            ACÁ
-          </button>
+          Podés visualizar tu entrada en tu mail o descargarla clickeando abajo
         </p>
 
         {pdfs && pdfs.length > 0 && (
           <div className='mt-6 space-y-4'>
             <h3 className='text-lg font-semibold text-black'>
-              Descargar Tickets
+              Descarga de Tickets
             </h3>
 
             {pdfs.length > 1 ? (
@@ -90,7 +84,7 @@ function BuyTicketsModal({ isOpen, onClose, pdfs }: BuyTicketsModalProps) {
                     <Button
                       key={pdf.ticketId}
                       onClick={() => downloadPdf(pdf.pdfBase64, pdf.ticketId)}
-                      className='flex items-center justify-center gap-2 bg-MiExpo_purple hover:bg-MiExpo_purple/90 text-white'
+                      className='cursor-pointer flex items-center justify-center gap-2 bg-MiExpo_purple hover:bg-MiExpo_purple/90 text-white'
                     >
                       <Download className='w-4 h-4' />
                       <span>Descargar Ticket {index + 1}</span>
@@ -99,7 +93,7 @@ function BuyTicketsModal({ isOpen, onClose, pdfs }: BuyTicketsModalProps) {
                 </div>
                 <Button
                   onClick={downloadAllPdfs}
-                  className='w-full flex items-center justify-center gap-2 bg-black hover:bg-black/80 text-white mt-2'
+                  className='cursor-pointer w-full flex items-center justify-center gap-2 bg-black hover:bg-black/80 text-white mt-2'
                 >
                   <Download className='w-4 h-4' />
                   <span>Descargar Todos los Tickets</span>
@@ -108,7 +102,7 @@ function BuyTicketsModal({ isOpen, onClose, pdfs }: BuyTicketsModalProps) {
             ) : (
               <Button
                 onClick={() => downloadPdf(pdfs[0].pdfBase64, pdfs[0].ticketId)}
-                className='w-full flex items-center justify-center gap-2 bg-MiExpo_purple hover:bg-MiExpo_purple/90 text-white'
+                className='cursor-pointer w-full flex items-center justify-center gap-2 bg-MiExpo_purple hover:bg-MiExpo_purple/90 text-white'
               >
                 <Download className='w-4 h-4' />
                 <span>Descargar Ticket</span>
