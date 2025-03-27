@@ -28,7 +28,7 @@ function TicketPurchase({
   const createTicketGroup = trpc.ticketGroup.create.useMutation();
   const deleteTicketGroup = trpc.ticketGroup.delete.useMutation();
   const eventTicket = eventTickets?.filter(
-    (ticket) => ticket.type === 'PARTICIPANT',
+    (ticket) => ticket.type === 'SPECTATOR',
   )[0];
   const handlePurchase = async () => {
     if (quantity === '0') return;
