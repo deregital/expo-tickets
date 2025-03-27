@@ -2,7 +2,7 @@ import {
   createTicketGroupSchema,
   updateTicketGroupSchema,
 } from 'expo-backend-types';
-import { handleError, router, ticketsProcedure } from '../trpc';
+import { handleError, router, ticketsProcedure } from '@/server/trpc';
 import { z } from 'zod';
 
 export const ticketGroupRouter = router({
