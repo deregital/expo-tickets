@@ -14,11 +14,12 @@ import { trpc } from '@/server/trpc/client';
 
 interface TicketPurchaseModalProps {
   isOpen: boolean;
-  onClose: () => void;
+  onClose: (bought: boolean) => void;
   quantity: string;
   price: number;
   eventId: string;
   ticketType: 'PARTICIPANT' | 'STAFF' | 'SPECTATOR';
+  ticketGroupId: string;
 }
 
 // Define the PDF data type based on the API response
@@ -34,6 +35,7 @@ function TicketPurchaseModal({
   price,
   ticketType,
   eventId,
+  ticketGroupId,
 }: TicketPurchaseModalProps) {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
@@ -44,7 +46,7 @@ function TicketPurchaseModal({
       if (data?.pdfs) {
         setPdfData(data.pdfs);
         setShowSuccessModal(true);
-        onClose();
+        onClose(true);
       }
     },
     onError: (error) => {
@@ -104,8 +106,8 @@ function TicketPurchaseModal({
         if (quantity === '1') {
           await createManyTickets.mutateAsync([
             {
-              status: 'FREE' as const,
               eventId: eventId,
+              ticketGroupId: ticketGroupId,
               type: ticketType,
               fullName: formData.nombre + ' ' + formData.apellido,
               mail: formData.email,
@@ -114,14 +116,14 @@ function TicketPurchaseModal({
         } else {
           await createManyTickets.mutateAsync([
             {
-              status: 'FREE' as const,
               eventId: eventId,
+              ticketGroupId: ticketGroupId,
               type: ticketType,
               fullName: formData.nombre + ' ' + formData.apellido,
               mail: formData.email,
             },
             ...formData.additionalTickets.map((ticket) => ({
-              status: 'FREE' as const,
+              ticketGroupId: ticketGroupId,
               eventId: eventId,
               type: ticketType,
               fullName: ticket,
@@ -147,7 +149,7 @@ function TicketPurchaseModal({
 
   return (
     <>
-      <Dialog open={isOpen} onOpenChange={onClose}>
+      <Dialog open={isOpen} onOpenChange={() => onClose(false)}>
         <DialogContent className='bg-MiExpo_white rounded-[20px] p-6 max-w-sm mx-auto max-h-[90vh]'>
           <DialogHeader className='mb-2'>
             <DialogTitle className='text-lg font-medium text-MiExpo_black'>

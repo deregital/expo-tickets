@@ -4,6 +4,7 @@ import CardEvent from './CardEvent';
 import { trpc } from '@/server/trpc/client';
 import { useParamsFilter } from '@/lib/useFilter';
 import { useFilteredEvents } from '@/hooks/useFilteredEvents';
+import Link from 'next/link';
 
 function GridEvents() {
   const { search, province, city, date } = useParamsFilter();
@@ -43,17 +44,20 @@ function GridEvents() {
           );
 
           return (
-            <CardEvent
-              key={event.id}
-              id={event.id}
-              title={event.name}
-              dayOfWeek={dayOfWeek}
-              date={day}
-              month={month}
-              year={year}
-              time={time}
-              imageUrl='/Foto.png'
-            />
+            <div key={event.id}>
+              <Link href={`/${event.id}`}>
+                <CardEvent
+                  title={event.name}
+                  dayOfWeek={dayOfWeek}
+                  date={day}
+                  month={month}
+                  year={year}
+                  time={time}
+                  imageUrl='/Foto.png'
+                  disabled={false}
+                />
+              </Link>
+            </div>
           );
         })}
       </div>

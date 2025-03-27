@@ -2,10 +2,12 @@ import { router } from '@/server/trpc';
 import { filterEventsRouter } from '@/server/routers/filterEvents';
 import { type inferRouterOutputs } from '@trpc/server';
 import { ticketsRouter } from '@/server/routers/tickets';
+import { ticketGroupRouter } from '@/server/routers/ticket-group';
 
 export const appRouter = router({
   filterEvents: filterEventsRouter,
   tickets: ticketsRouter,
+  ticketGroup: ticketGroupRouter,
 });
 
 export type AppRouter = typeof appRouter;

@@ -11,6 +11,7 @@ import {
 import TicketPurchaseModal from './TicketPurchaseModal';
 import { type RouterOutputs } from '@/server/routers/app';
 import { TICKET_INFORMATION } from '@/constants';
+import { trpc } from '@/server/trpc/client';
 
 function TicketPurchase({
   eventTickets,
@@ -21,14 +22,40 @@ function TicketPurchase({
 }) {
   const [quantity, setQuantity] = useState('1');
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const handlePurchase = () => {
+  const [ticketGroupId, setTicketGroupId] = useState<
+    RouterOutputs['ticketGroup']['create']['id'] | null
+  >(null);
+  const createTicketGroup = trpc.ticketGroup.create.useMutation();
+  const deleteTicketGroup = trpc.ticketGroup.delete.useMutation();
+  const eventTicket = eventTickets?.filter(
+    (ticket) => ticket.type === 'PARTICIPANT',
+  )[0];
+  const handlePurchase = async () => {
     if (quantity === '0') return;
+
+    await createTicketGroup
+      .mutateAsync({
+        eventId,
+        amountTickets: parseInt(quantity),
+        status:
+          eventTicket.price === null || eventTicket.price === 0
+            ? 'FREE'
+            : 'BOOKED',
+      })
+      .then((ticketGroupData) => {
+        setTicketGroupId(ticketGroupData.id);
+      });
+
     setIsModalOpen(true);
   };
 
-  const handleCloseModal = () => {
+  const handleCloseModal = async (bought: boolean) => {
     setIsModalOpen(false);
+    if (!bought) {
+      await deleteTicketGroup.mutateAsync(ticketGroupId || '').then(() => {
+        setTicketGroupId(null);
+      });
+    }
   };
 
   return (
@@ -97,9 +124,10 @@ function TicketPurchase({
         isOpen={isModalOpen}
         onClose={handleCloseModal}
         quantity={quantity}
-        price={eventTickets?.[0]?.price ? eventTickets[0].price : 0}
+        price={eventTicket.price || 0}
         eventId={eventId}
-        ticketType={eventTickets?.[0]?.type || 'PARTICIPANT'}
+        ticketType={eventTicket.type}
+        ticketGroupId={ticketGroupId || ''}
       />
     </div>
   );
