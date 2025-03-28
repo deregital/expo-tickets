@@ -33,11 +33,7 @@ function TicketPurchase({
   const createTicketGroup = trpc.ticketGroup.create.useMutation({
     onError: (error) => {
       setShowErrorModal(true);
-      setErrorMessage(
-        error.data?.code === 'CONFLICT'
-          ? 'No hay tickets disponibles'
-          : 'No se pudo reservar los tickets',
-      );
+      setErrorMessage(error.message);
     },
   });
   const deleteTicketGroup = trpc.ticketGroup.delete.useMutation();
@@ -101,7 +97,7 @@ function TicketPurchase({
             <SelectTrigger className='w-24 bg-white text-MiExpo_black border border-MiExpo_gray'>
               <SelectValue placeholder='1' />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent align='end'>
               {[1, 2, 3, 4, 5].map((num) => (
                 <SelectItem key={num} value={num.toString()}>
                   {num}
