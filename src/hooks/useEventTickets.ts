@@ -17,14 +17,14 @@ export function useEventTickets(
       (ticket) => ticket.type === 'SPECTATOR',
     )?.amount;
 
-    if (!maxTickets) {
+    if (maxTickets === undefined || maxTickets === null) {
       setEventDisabled(true);
       return;
     }
 
-    if (ticketsEmited?.tickets && ticketsEmited.tickets >= maxTickets) {
+    if (ticketsEmited && ticketsEmited >= maxTickets) {
       setEventDisabled(true);
-    } else if (!ticketsEmited?.tickets) {
+    } else if (ticketsEmited === undefined) {
       setEventDisabled(true);
     } else {
       setEventDisabled(false);

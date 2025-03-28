@@ -36,7 +36,7 @@ export const ticketGroupRouter = router({
       if (error) {
         throw handleError(error);
       }
-      return data;
+      return data.tickets;
     }),
 
   update: ticketsProcedure
