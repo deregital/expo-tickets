@@ -8,6 +8,7 @@ export function useEventTickets(
   eventTickets: RouterOutputs['filterEvents']['getEvents']['events'][number]['eventTickets'],
 ) {
   const [eventDisabled, setEventDisabled] = useState(false);
+  const [ticketsAvailable, setTicketsAvailable] = useState(0);
 
   const { data: ticketsEmited } =
     trpc.ticketGroup.getTicketsByEvent.useQuery(eventId);
@@ -28,8 +29,9 @@ export function useEventTickets(
       setEventDisabled(true);
     } else {
       setEventDisabled(false);
+      setTicketsAvailable(maxTickets - ticketsEmited);
     }
-  }, [eventTickets, ticketsEmited]);
+  }, [eventTickets, ticketsEmited, eventId]);
 
-  return { eventDisabled };
+  return { eventDisabled, ticketsAvailable };
 }

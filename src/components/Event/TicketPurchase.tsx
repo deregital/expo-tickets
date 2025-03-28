@@ -12,6 +12,8 @@ import TicketPurchaseModal from './TicketPurchaseModal';
 import { type RouterOutputs } from '@/server/routers/app';
 import { TICKET_INFORMATION } from '@/constants';
 import { trpc } from '@/server/trpc/client';
+import { useEventTickets } from '@/hooks/useEventTickets';
+import ErrorModal from './ErrorModal';
 
 function TicketPurchase({
   eventTickets,
@@ -22,16 +24,29 @@ function TicketPurchase({
 }) {
   const [quantity, setQuantity] = useState('1');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const [ticketGroupId, setTicketGroupId] = useState<
     RouterOutputs['ticketGroup']['create']['id'] | null
   >(null);
-  const createTicketGroup = trpc.ticketGroup.create.useMutation();
+  const { ticketsAvailable } = useEventTickets(eventId, eventTickets);
+  const createTicketGroup = trpc.ticketGroup.create.useMutation({
+    onError: (error) => {
+      setShowErrorModal(true);
+      setErrorMessage(
+        error.data?.code === 'CONFLICT'
+          ? 'No hay tickets disponibles'
+          : 'No se pudo reservar los tickets',
+      );
+    },
+  });
   const deleteTicketGroup = trpc.ticketGroup.delete.useMutation();
   const eventTicket = eventTickets?.filter(
     (ticket) => ticket.type === 'SPECTATOR',
   )[0];
   const handlePurchase = async () => {
     if (quantity === '0') return;
+    if (ticketsAvailable < parseInt(quantity)) return;
 
     await createTicketGroup
       .mutateAsync({
@@ -104,7 +119,8 @@ function TicketPurchase({
           onClick={handlePurchase}
           disabled={
             quantity === '0' ||
-            Boolean(eventTicket?.price && eventTicket.price > 0)
+            Boolean(eventTicket?.price && eventTicket.price > 0) ||
+            ticketsAvailable < parseInt(quantity)
           }
         >
           COMPRAR
@@ -131,6 +147,12 @@ function TicketPurchase({
         eventId={eventId}
         ticketType={eventTicket.type}
         ticketGroupId={ticketGroupId || ''}
+      />
+      <ErrorModal
+        isOpen={showErrorModal}
+        onClose={() => setShowErrorModal(false)}
+        errorTitle={'No se pudo reservar los tickets'}
+        errorMessage={errorMessage}
       />
     </div>
   );

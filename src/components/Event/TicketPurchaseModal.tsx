@@ -302,6 +302,7 @@ function TicketPurchaseModal({
       <ErrorModal
         isOpen={showErrorModal}
         onClose={handleErrorModalClose}
+        errorTitle={'No se pudo realizar la compra'}
         errorMessage={errorMessage}
       />
     </>

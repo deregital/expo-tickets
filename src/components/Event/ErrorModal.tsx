@@ -4,10 +4,16 @@ import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 interface ErrorModalProps {
   isOpen: boolean;
   onClose: () => void;
+  errorTitle: string;
   errorMessage: string;
 }
 
-function ErrorModal({ isOpen, onClose, errorMessage }: ErrorModalProps) {
+function ErrorModal({
+  isOpen,
+  onClose,
+  errorTitle,
+  errorMessage,
+}: ErrorModalProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <VisuallyHidden asChild>
@@ -20,9 +26,7 @@ function ErrorModal({ isOpen, onClose, errorMessage }: ErrorModalProps) {
             <X className='w-12 h-12 text-black stroke-[3]' />
           </div>
         </div>
-        <h2 className='text-2xl font-bold text-black mb-2'>
-          No se pudo realizar la compra.
-        </h2>
+        <h2 className='text-2xl font-bold text-black mb-2'>{errorTitle}</h2>
         <p className='text-lg text-black mb-4'>{errorMessage}</p>
       </DialogContent>
     </Dialog>
