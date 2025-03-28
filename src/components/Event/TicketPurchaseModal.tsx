@@ -39,6 +39,7 @@ function TicketPurchaseModal({
 }: TicketPurchaseModalProps) {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const [pdfData, setPdfData] = useState<PdfData>([]);
 
   const createManyTickets = trpc.tickets.createMany.useMutation({
@@ -50,6 +51,10 @@ function TicketPurchaseModal({
       }
     },
     onError: (error) => {
+      setErrorMessage(
+        error?.data?.zodError?.fieldErrors[0]![0] ||
+          'Se ha producido un error al comprar los tickets. Vuelva a intentarlo.',
+      );
       setShowErrorModal(true);
     },
   });
@@ -60,7 +65,9 @@ function TicketPurchaseModal({
     nombre: '',
     apellido: '',
     email: '',
+    dni: '',
     additionalTickets: Array(Math.max(0, ticketsCount - 1)).fill(''),
+    additionalDnis: Array(Math.max(0, ticketsCount - 1)).fill(''),
   });
 
   useEffect(() => {
@@ -68,7 +75,9 @@ function TicketPurchaseModal({
       nombre: '',
       apellido: '',
       email: '',
+      dni: '',
       additionalTickets: Array(Math.max(0, ticketsCount - 1)).fill(''),
+      additionalDnis: Array(Math.max(0, ticketsCount - 1)).fill(''),
     });
   }, [ticketsCount]);
 
@@ -78,7 +87,9 @@ function TicketPurchaseModal({
         nombre: '',
         apellido: '',
         email: '',
+        dni: '',
         additionalTickets: Array(Math.max(0, ticketsCount - 1)).fill(''),
+        additionalDnis: Array(Math.max(0, ticketsCount - 1)).fill(''),
       });
     }
   }, [isOpen, ticketsCount]);
@@ -100,6 +111,16 @@ function TicketPurchaseModal({
     });
   };
 
+  const handleAdditionalDniChange = (index: number, value: string) => {
+    const newAdditionalDnis = [...formData.additionalDnis];
+    newAdditionalDnis[index] = value;
+
+    setFormData({
+      ...formData,
+      additionalDnis: newAdditionalDnis,
+    });
+  };
+
   const handleSubmit = async () => {
     if (price === 0) {
       try {
@@ -111,6 +132,7 @@ function TicketPurchaseModal({
               type: ticketType,
               fullName: formData.nombre + ' ' + formData.apellido,
               mail: formData.email,
+              dni: formData.dni,
             },
           ]);
         } else {
@@ -121,13 +143,15 @@ function TicketPurchaseModal({
               type: ticketType,
               fullName: formData.nombre + ' ' + formData.apellido,
               mail: formData.email,
+              dni: formData.dni,
             },
-            ...formData.additionalTickets.map((ticket) => ({
+            ...formData.additionalTickets.map((ticket, index) => ({
               ticketGroupId: ticketGroupId,
               eventId: eventId,
               type: ticketType,
               fullName: ticket,
               mail: formData.email,
+              dni: formData.additionalDnis[index],
             })),
           ]);
         }
@@ -203,27 +227,58 @@ function TicketPurchaseModal({
               />
             </div>
 
+            <div className='rounded-[10px] border border-MiExpo_gray overflow-hidden'>
+              <div className='py-2 bg-white'>
+                <p className='text-sm text-center font-medium text-MiExpo_black'>
+                  DNI del titular de la entrada 1
+                </p>
+              </div>
+              <div className='w-full h-[1px] bg-MiExpo_gray'></div>
+              <Input
+                name='dni'
+                value={formData.dni}
+                onChange={handleChange}
+                className='w-full h-10 bg-MiExpo_white border-none rounded-none focus:ring-0 focus:outline-none focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none px-4'
+              />
+            </div>
+
             {/* Tickets adicionales */}
             {ticketsCount > 1 && (
               <>
                 {Array.from({ length: ticketsCount - 1 }).map((_, index) => (
-                  <div
-                    key={index}
-                    className='rounded-[10px] border border-MiExpo_gray overflow-hidden'
-                  >
-                    <div className='py-2 bg-white'>
-                      <p className='text-sm text-center font-medium text-MiExpo_black'>
-                        Nombre y apellido del titular de la entrada {index + 2}
-                      </p>
+                  <div key={index} className='space-y-4 mb-4'>
+                    <div className='rounded-[10px] border border-MiExpo_gray overflow-hidden'>
+                      <div className='py-2 bg-white'>
+                        <p className='text-sm text-center font-medium text-MiExpo_black'>
+                          Nombre y apellido del titular de la entrada{' '}
+                          {index + 2}
+                        </p>
+                      </div>
+                      <div className='w-full h-[1px] bg-MiExpo_gray'></div>
+                      <Input
+                        value={formData.additionalTickets[index]}
+                        onChange={(e) =>
+                          handleAdditionalTicketChange(index, e.target.value)
+                        }
+                        className={`w-full h-10 bg-MiExpo_white border-none rounded-none focus:ring-0 focus:outline-none focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none px-4`}
+                      />
                     </div>
-                    <div className='w-full h-[1px] bg-MiExpo_gray'></div>
-                    <Input
-                      value={formData.additionalTickets[index]}
-                      onChange={(e) =>
-                        handleAdditionalTicketChange(index, e.target.value)
-                      }
-                      className={`w-full h-10 bg-MiExpo_white border-none rounded-none focus:ring-0 focus:outline-none focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none px-4`}
-                    />
+
+                    <div className='rounded-[10px] border border-MiExpo_gray overflow-hidden'>
+                      <div className='py-2 bg-white'>
+                        <p className='text-sm text-center font-medium text-MiExpo_black'>
+                          DNI del titular de la entrada {index + 2}
+                        </p>
+                      </div>
+                      <div className='w-full h-[1px] bg-MiExpo_gray'></div>
+                      <Input
+                        value={formData.additionalDnis[index]}
+                        onChange={(e) =>
+                          handleAdditionalDniChange(index, e.target.value)
+                        }
+                        className={`w-full h-10 bg-MiExpo_white border-none rounded-none focus:ring-0 focus:outline-none focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none px-4`}
+                      />
+                    </div>
                   </div>
                 ))}
               </>
@@ -244,7 +299,11 @@ function TicketPurchaseModal({
         onClose={handleSuccessModalClose}
         pdfs={pdfData}
       />
-      <ErrorModal isOpen={showErrorModal} onClose={handleErrorModalClose} />
+      <ErrorModal
+        isOpen={showErrorModal}
+        onClose={handleErrorModalClose}
+        errorMessage={errorMessage}
+      />
     </>
   );
 }

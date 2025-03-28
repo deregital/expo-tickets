@@ -1,10 +1,8 @@
 'use client';
-import { formatEventDate } from '@/lib/utils';
-import CardEvent from './CardEvent';
 import { trpc } from '@/server/trpc/client';
 import { useParamsFilter } from '@/lib/useFilter';
 import { useFilteredEvents } from '@/hooks/useFilteredEvents';
-import Link from 'next/link';
+import EventCardContainer from './EventCardContainer';
 
 function GridEvents() {
   const { search, province, city, date } = useParamsFilter();
@@ -38,28 +36,11 @@ function GridEvents() {
   return (
     <div className='max-w-full mx-5 md:mx-[3rem] py-4 sm:py-8'>
       <div className='flex flex-wrap gap-6 items-center'>
-        {filteredEvents.map((event) => {
-          const { day, month, year, time, dayOfWeek } = formatEventDate(
-            event.startingDate,
-          );
-
-          return (
-            <div key={event.id}>
-              <Link href={`/${event.id}`}>
-                <CardEvent
-                  title={event.name}
-                  dayOfWeek={dayOfWeek}
-                  date={day}
-                  month={month}
-                  year={year}
-                  time={time}
-                  imageUrl='/Foto.png'
-                  disabled={false}
-                />
-              </Link>
-            </div>
-          );
-        })}
+        {filteredEvents.map((event) => (
+          <div key={event.id}>
+            <EventCardContainer event={event} />
+          </div>
+        ))}
       </div>
     </div>
   );

@@ -1,0 +1,41 @@
+'use client';
+import { formatEventDate } from '@/lib/utils';
+import CardEvent from './CardEvent';
+import Link from 'next/link';
+import { useEventTickets } from '@/hooks/useEventTickets';
+import { type RouterOutputs } from '@/server/routers/app';
+
+type Event = RouterOutputs['filterEvents']['getEvents']['events'][number];
+
+interface EventCardContainerProps {
+  event: Event;
+}
+
+function EventCardContainer({ event }: EventCardContainerProps) {
+  const { day, month, year, time, dayOfWeek } = formatEventDate(
+    event.startingDate,
+  );
+
+  const { eventDisabled } = useEventTickets(event.id, event.eventTickets);
+
+  const cardEvent = (
+    <CardEvent
+      title={event.name}
+      dayOfWeek={dayOfWeek}
+      date={day}
+      month={month}
+      year={year}
+      time={time}
+      imageUrl='/Foto.png'
+      disabled={eventDisabled}
+    />
+  );
+
+  return eventDisabled ? (
+    cardEvent
+  ) : (
+    <Link href={`/${event.id}`}>{cardEvent}</Link>
+  );
+}
+
+export default EventCardContainer;
