@@ -14,6 +14,10 @@ async function EventPage({ params }: EventPageProps) {
   const { slug } = await params;
   const event = await trpc.filterEvents.getEventById(slug);
 
+  const eventTicketSpectator = event?.eventTickets.filter(
+    (ticket) => ticket.type === 'SPECTATOR',
+  )[0];
+
   if (!event) {
     return (
       <div className='max-w-7xl mx-5 md:mx-[3rem] py-8 px-4'>
@@ -34,7 +38,7 @@ async function EventPage({ params }: EventPageProps) {
             <div className='col-span-12 px-6 pb-4 overflow-hidden'>
               <TicketPurchase
                 eventId={event.id}
-                eventTickets={event.eventTickets}
+                eventTicket={eventTicketSpectator}
               />
             </div>
             <div className='col-span-4 px-4 flex flex-col justify-start items-center overflow-hidden'>
@@ -84,7 +88,7 @@ async function EventPage({ params }: EventPageProps) {
           <div className='p-4'>
             <TicketPurchase
               eventId={event.id}
-              eventTickets={event.eventTickets}
+              eventTicket={eventTicketSpectator}
             />
           </div>
           <div className='p-4'>

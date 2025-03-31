@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 
 export function useEventTickets(
   eventId: string,
-  eventTickets: RouterOutputs['filterEvents']['getEvents']['events'][number]['eventTickets'],
+  eventTicket: RouterOutputs['filterEvents']['getEvents']['events'][number]['eventTickets'][number],
 ) {
   const [eventDisabled, setEventDisabled] = useState(false);
   const [ticketsAvailable, setTicketsAvailable] = useState(0);
@@ -14,9 +14,7 @@ export function useEventTickets(
     trpc.ticketGroup.getTicketsByEvent.useQuery(eventId);
 
   useEffect(() => {
-    const maxTickets = eventTickets.find(
-      (ticket) => ticket.type === 'SPECTATOR',
-    )?.amount;
+    const maxTickets = eventTicket.amount;
 
     if (maxTickets === undefined || maxTickets === null) {
       setEventDisabled(true);
@@ -31,7 +29,7 @@ export function useEventTickets(
       setEventDisabled(false);
       setTicketsAvailable(maxTickets - ticketsEmited);
     }
-  }, [eventTickets, ticketsEmited, eventId]);
+  }, [eventTicket, ticketsEmited, eventId]);
 
   return { eventDisabled, ticketsAvailable };
 }

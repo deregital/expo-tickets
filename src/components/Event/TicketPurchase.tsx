@@ -16,10 +16,10 @@ import { useEventTickets } from '@/hooks/useEventTickets';
 import ErrorModal from './ErrorModal';
 
 function TicketPurchase({
-  eventTickets,
+  eventTicket,
   eventId,
 }: {
-  eventTickets: RouterOutputs['filterEvents']['getEvents']['events'][number]['eventTickets'];
+  eventTicket: RouterOutputs['filterEvents']['getEvents']['events'][number]['eventTickets'][number];
   eventId: string;
 }) {
   const [quantity, setQuantity] = useState('1');
@@ -29,7 +29,7 @@ function TicketPurchase({
   const [ticketGroupId, setTicketGroupId] = useState<
     RouterOutputs['ticketGroup']['create']['id'] | null
   >(null);
-  const { ticketsAvailable } = useEventTickets(eventId, eventTickets);
+  const { ticketsAvailable } = useEventTickets(eventId, eventTicket);
   const createTicketGroup = trpc.ticketGroup.create.useMutation({
     onError: (error) => {
       setShowErrorModal(true);
@@ -37,9 +37,7 @@ function TicketPurchase({
     },
   });
   const deleteTicketGroup = trpc.ticketGroup.delete.useMutation();
-  const eventTicket = eventTickets?.filter(
-    (ticket) => ticket.type === 'SPECTATOR',
-  )[0];
+
   const handlePurchase = async () => {
     if (quantity === '0') return;
     if (ticketsAvailable < parseInt(quantity)) return;
@@ -90,7 +88,7 @@ function TicketPurchase({
           {TICKET_INFORMATION.name}
         </div>
         <div className='text-MiExpo_black text-[12px] sm:text-[16px] font-normal leading-[100%] text-center'>
-          ${eventTickets?.[0]?.price ? eventTickets[0].price : 0}
+          ${eventTicket?.price ? eventTicket.price : 0}
         </div>
         <div className='flex justify-end'>
           <Select value={quantity} onValueChange={setQuantity}>

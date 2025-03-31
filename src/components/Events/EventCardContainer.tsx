@@ -16,7 +16,11 @@ function EventCardContainer({ event }: EventCardContainerProps) {
     event.startingDate,
   );
 
-  const { eventDisabled } = useEventTickets(event.id, event.eventTickets);
+  const eventTicket = event.eventTickets.filter(
+    (ticket) => ticket.type === 'SPECTATOR',
+  )[0];
+
+  const { eventDisabled } = useEventTickets(event.id, eventTicket);
 
   const cardEvent = (
     <CardEvent
