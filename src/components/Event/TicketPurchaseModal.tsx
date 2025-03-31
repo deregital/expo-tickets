@@ -51,9 +51,13 @@ function TicketPurchaseModal({
       }
     },
     onError: (error) => {
+      console.log(error.data?.zodError?.fieldErrors[1]![0]);
       setErrorMessage(
-        error?.data?.zodError?.fieldErrors[0]![0] ||
-          'Se ha producido un error al comprar los tickets. Vuelva a intentarlo.',
+        error?.data?.zodError?.fieldErrors[0]
+          ? error?.data?.zodError?.fieldErrors[0][0]
+          : error?.data?.zodError?.fieldErrors[1]
+            ? error?.data?.zodError?.fieldErrors[1][0]
+            : 'Se ha producido un error al comprar los tickets. Vuelva a intentarlo.',
       );
       setShowErrorModal(true);
     },
@@ -130,7 +134,11 @@ function TicketPurchaseModal({
               eventId: eventId,
               ticketGroupId: ticketGroupId,
               type: ticketType,
-              fullName: formData.nombre + ' ' + formData.apellido,
+              fullName: formData.nombre
+                ? formData.nombre.length > 0
+                  ? formData.nombre + ' ' + formData.apellido
+                  : formData.apellido
+                : formData.apellido,
               mail: formData.email,
               dni: formData.dni,
             },
