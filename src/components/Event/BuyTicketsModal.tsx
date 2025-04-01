@@ -2,7 +2,6 @@
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { Check, Download } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { type RouterOutputs } from '@/server/routers/app';
 
@@ -13,8 +12,6 @@ interface BuyTicketsModalProps {
 }
 
 function BuyTicketsModal({ isOpen, onClose, pdfs }: BuyTicketsModalProps) {
-  const router = useRouter();
-
   const downloadPdf = (pdfBase64: string, ticketId: string) => {
     try {
       const byteCharacters = atob(pdfBase64);
