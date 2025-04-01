@@ -6,7 +6,7 @@ function Navbar() {
   const router = useRouter();
 
   return (
-    <div className='pl-[80px] sm:pl-[143px] flex items-center gap-x-[40px] sm:gap-x-[80px]'>
+    <div className='pl-10 sm:pl-14 flex items-center gap-x-[40px] sm:gap-x-[80px]'>
       <h3
         onClick={() => router.push('/')}
         className='hover:cursor-pointer text-MiExpo_white text-[1rem] sm:text-[1.2rem] lg:text-[1.5rem] font-sans leading-[32px] relative group'
