@@ -16,7 +16,6 @@ export const filterEventsRouter = router({
         },
       );
       if (error) {
-        console.log(error);
         throw handleError(error);
       }
       return data;
@@ -24,7 +23,6 @@ export const filterEventsRouter = router({
   getProvinces: ticketsProcedure.query(async ({ ctx }) => {
     const { data, error } = await ctx.fetch.GET('/location/arg-states');
     if (error) {
-      console.log(error);
       throw handleError(error);
     }
     return data;
@@ -32,7 +30,6 @@ export const filterEventsRouter = router({
   getEvents: ticketsProcedure.query(async ({ ctx }) => {
     const { data, error } = await ctx.fetch.GET('/event/find-active');
     if (error) {
-      console.log(error);
       throw handleError(error);
     }
     return data;

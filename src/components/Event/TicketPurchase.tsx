@@ -11,22 +11,60 @@ import {
 import TicketPurchaseModal from './TicketPurchaseModal';
 import { type RouterOutputs } from '@/server/routers/app';
 import { TICKET_INFORMATION } from '@/constants';
+import { trpc } from '@/server/trpc/client';
+import { useEventTickets } from '@/hooks/useEventTickets';
+import ErrorModal from './ErrorModal';
 
 function TicketPurchase({
-  eventTickets,
+  eventTicket,
+  eventId,
 }: {
-  eventTickets: RouterOutputs['filterEvents']['getEvents']['events'][number]['eventTickets'];
+  eventTicket: RouterOutputs['filterEvents']['getEvents']['events'][number]['eventTickets'][number];
+  eventId: string;
 }) {
   const [quantity, setQuantity] = useState('1');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [ticketGroupId, setTicketGroupId] = useState<
+    RouterOutputs['ticketGroup']['create']['id'] | null
+  >(null);
+  const { ticketsAvailable } = useEventTickets(eventId, eventTicket);
+  const createTicketGroup = trpc.ticketGroup.create.useMutation({
+    onError: (error) => {
+      setShowErrorModal(true);
+      setErrorMessage(error.message);
+    },
+  });
+  const deleteTicketGroup = trpc.ticketGroup.delete.useMutation();
 
-  const handlePurchase = () => {
+  const handlePurchase = async () => {
     if (quantity === '0') return;
+    if (ticketsAvailable < parseInt(quantity)) return;
+
+    await createTicketGroup
+      .mutateAsync({
+        eventId,
+        amountTickets: parseInt(quantity),
+        status:
+          eventTicket.price === null || eventTicket.price === 0
+            ? 'FREE'
+            : 'BOOKED',
+      })
+      .then((ticketGroupData) => {
+        setTicketGroupId(ticketGroupData.id);
+      });
+
     setIsModalOpen(true);
   };
 
-  const handleCloseModal = () => {
+  const handleCloseModal = async (bought: boolean) => {
     setIsModalOpen(false);
+    if (!bought) {
+      await deleteTicketGroup.mutateAsync(ticketGroupId || '').then(() => {
+        setTicketGroupId(null);
+      });
+    }
   };
 
   return (
@@ -50,14 +88,14 @@ function TicketPurchase({
           {TICKET_INFORMATION.name}
         </div>
         <div className='text-MiExpo_black text-[12px] sm:text-[16px] font-normal leading-[100%] text-center'>
-          ${eventTickets?.[0]?.price?.toLocaleString('es-AR')}
+          ${eventTicket?.price ? eventTicket.price : 0}
         </div>
         <div className='flex justify-end'>
           <Select value={quantity} onValueChange={setQuantity}>
             <SelectTrigger className='w-24 bg-white text-MiExpo_black border border-MiExpo_gray'>
               <SelectValue placeholder='1' />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent align='end'>
               {[1, 2, 3, 4, 5].map((num) => (
                 <SelectItem key={num} value={num.toString()}>
                   {num}
@@ -73,7 +111,11 @@ function TicketPurchase({
         <Button
           className='bg-MiExpo_purple cursor-pointer col-span-1 hover:bg-MiExpo_purple/90 text-MiExpo_white font-medium text-[12px] sm:text-[16px] leading-[100%] px-8 py-2 rounded-[10px]'
           onClick={handlePurchase}
-          disabled={quantity === '0'}
+          disabled={
+            quantity === '0' ||
+            Boolean(eventTicket?.price && eventTicket.price > 0) ||
+            ticketsAvailable < parseInt(quantity)
+          }
         >
           COMPRAR
         </Button>
@@ -95,6 +137,16 @@ function TicketPurchase({
         isOpen={isModalOpen}
         onClose={handleCloseModal}
         quantity={quantity}
+        price={eventTicket.price || 0}
+        eventId={eventId}
+        ticketType={eventTicket.type}
+        ticketGroupId={ticketGroupId || ''}
+      />
+      <ErrorModal
+        isOpen={showErrorModal}
+        onClose={() => setShowErrorModal(false)}
+        errorTitle={'No se pudo reservar los tickets'}
+        errorMessage={errorMessage}
       />
     </div>
   );
