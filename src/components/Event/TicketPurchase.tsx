@@ -111,11 +111,7 @@ function TicketPurchase({
         <Button
           className='bg-MiExpo_purple cursor-pointer col-span-1 hover:bg-MiExpo_purple/90 text-MiExpo_white font-medium text-[12px] sm:text-[16px] leading-[100%] px-8 py-2 rounded-[10px]'
           onClick={handlePurchase}
-          disabled={
-            quantity === '0' ||
-            Boolean(eventTicket?.price && eventTicket.price > 0) ||
-            ticketsAvailable < parseInt(quantity)
-          }
+          disabled={quantity === '0' || ticketsAvailable < parseInt(quantity)}
         >
           COMPRAR
         </Button>

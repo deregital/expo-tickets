@@ -77,6 +77,20 @@ function TicketPurchaseModal({
       );
     },
   });
+  const createPreference = trpc.mercadopago.createPreference.useMutation({
+    onSuccess: (data) => {
+      console.log('Preference:', data);
+    },
+    onError: (error) => {
+      const errors = Object.values(error.data?.zodError?.fieldErrors ?? {})[0];
+      console.log('Error:', errors);
+
+      setErrorMessage(
+        errors?.[0] ||
+          'Se ha producido un error al comprar los tickets. Vuelva a intentarlo.',
+      );
+    },
+  });
 
   const ticketsCount = parseInt(quantity, 10);
 
@@ -170,6 +184,31 @@ function TicketPurchaseModal({
         }
         // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
       } catch (error) {}
+    } else if (price > 0) {
+      const response = await createPreference.mutateAsync({
+        ticket_group_id: ticketGroupId,
+        items: [
+          {
+            id: '1',
+            title:
+              'Ticket ' +
+              (ticketType === 'PARTICIPANT'
+                ? 'participante'
+                : ticketType === 'STAFF'
+                  ? 'staff'
+                  : 'espectador'),
+            quantity: ticketsCount,
+            unit_price: price,
+          },
+        ],
+      });
+      if (response.init_point) {
+        window.location.href = response.init_point;
+      } else {
+        setErrorMessage(
+          'Hubo un error al crear el link de pago para la compra de los tickets. Por favor, intente nuevamente.',
+        );
+      }
     } else {
       setErrorMessage(
         'Hubo un error al crear los tickets. Por favor, intente nuevamente.',
