@@ -19,7 +19,6 @@ export const ticketGroupRouter = router({
       }
       return data;
     }),
-
   getTicketsByEvent: ticketsProcedure
     .input(z.string())
     .query(async ({ ctx, input }) => {
@@ -38,7 +37,30 @@ export const ticketGroupRouter = router({
       }
       return data.tickets;
     }),
-
+  findById: ticketsProcedure.input(z.string()).query(async ({ ctx, input }) => {
+    const { data, error } = await ctx.fetch.GET(
+      '/ticket-group/find-group/{id}',
+      {
+        params: { path: { id: input } },
+      },
+    );
+    if (error) {
+      throw handleError(error);
+    }
+    return data;
+  }),
+  getPdf: ticketsProcedure.input(z.string()).query(async ({ ctx, input }) => {
+    const { data, error } = await ctx.fetch.GET(
+      '/ticket/get-pdfs-by-ticket-group/{ticketGroupId}',
+      {
+        params: { path: { ticketGroupId: input } },
+      },
+    );
+    if (error) {
+      throw handleError(error);
+    }
+    return data;
+  }),
   update: ticketsProcedure
     .input(updateTicketGroupSchema.merge(z.object({ id: z.string() })))
     .mutation(async ({ ctx, input }) => {

@@ -8,7 +8,10 @@ export const ticketsRouter = router({
     .mutation(async ({ ctx, input }) => {
       const { data, error } = await ctx.fetch.POST('/ticket/create-many', {
         body: {
-          tickets: input,
+          tickets: input.map((ticket) => ({
+            ...ticket,
+            ticketGroupId: ticket.ticketGroupId ?? null,
+          })),
         },
       });
       if (error) {
