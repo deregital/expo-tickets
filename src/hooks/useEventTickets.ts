@@ -14,6 +14,10 @@ export function useEventTickets(
     trpc.ticketGroup.getTicketsByEvent.useQuery(eventId);
 
   useEffect(() => {
+    if (eventTicket === undefined || eventTicket === null || !eventTicket) {
+      setEventDisabled(true);
+      return;
+    }
     const maxTickets = eventTicket.amount;
 
     if (maxTickets === undefined || maxTickets === null) {
