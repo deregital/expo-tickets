@@ -27,7 +27,8 @@ export function useFilteredEvents(
     province: (event: Event) =>
       province ? event.location.includes(province) : true, // TODO: Fix this when we have provinces and googleMaps
     city: (event: Event) => (city ? event.location.includes(city) : true), // TODO: Fix this when we have provinces and googleMaps
-    date: (event: Event) => (date ? filterByDate(event.date, date) : true),
+    date: (event: Event) =>
+      date ? filterByDate(event.endingDate, date) : true,
   };
 
   return eventsData.events.filter((event) =>
