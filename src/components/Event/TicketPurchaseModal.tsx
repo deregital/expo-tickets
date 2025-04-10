@@ -1,5 +1,10 @@
 'use client';
-import { useState, useEffect, type HTMLInputTypeAttribute } from 'react';
+import {
+  useState,
+  useEffect,
+  type HTMLInputTypeAttribute,
+  useCallback,
+} from 'react';
 import {
   Dialog,
   DialogContent,
@@ -107,13 +112,21 @@ function TicketPurchaseModal({
       enabled: price === null && !!ticketGroupIdCreated,
     });
 
+  const handleClose = useCallback(
+    (bought: boolean) => {
+      setErrorMessage('');
+      onClose(bought);
+    },
+    [onClose],
+  );
+
   useEffect(() => {
     if (pdfs?.pdfs) {
       setPdfData(pdfs.pdfs);
       setShowSuccessModal(true);
       handleClose(true);
     }
-  }, [pdfs]);
+  }, [handleClose, pdfs]);
 
   const ticketsCount = parseInt(quantity, 10);
 
@@ -123,12 +136,7 @@ function TicketPurchaseModal({
 
   useEffect(() => {
     setFormData(defaultState(ticketsCount));
-  }, [ticketsCount, isOpen]); // }, [isOpen, ticketsCount]);
-
-  function handleClose(bought: boolean) {
-    setErrorMessage('');
-    onClose(bought);
-  }
+  }, [ticketsCount, isOpen]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({

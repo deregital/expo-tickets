@@ -20,7 +20,7 @@ function GridEvents() {
   if (isLoading) {
     return (
       <div className='max-w-7xl mx-auto py-8 px-4'>
-        <h1 className='text-2xl font-bold'>Cargando eventos...</h1>
+        <h1 className='text-2xl font-bold select-none'>Cargando eventos...</h1>
       </div>
     );
   }

@@ -56,8 +56,8 @@ function TicketPurchase({
 
   const handleCloseModal = async (bought: boolean) => {
     setIsModalOpen(false);
-    if (!bought) {
-      await deleteTicketGroup.mutateAsync(ticketGroupId || '').then(() => {
+    if (!bought && ticketGroupId) {
+      await deleteTicketGroup.mutateAsync(ticketGroupId).then(() => {
         setTicketGroupId(null);
       });
     }
