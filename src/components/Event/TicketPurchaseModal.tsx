@@ -10,12 +10,13 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import BuyTicketsModal from './BuyTicketsModal';
 import { trpc } from '@/server/trpc/client';
+import { type EventTicket } from 'expo-backend-types';
 
 interface TicketPurchaseModalProps {
   isOpen: boolean;
   onClose: (bought: boolean) => void;
   quantity: string;
-  price: number;
+  price: EventTicket['price'];
   eventId: string;
   ticketType: 'PARTICIPANT' | 'STAFF' | 'SPECTATOR';
   ticketGroupId: string;
@@ -63,14 +64,13 @@ function TicketPurchaseModal({
 
   const createManyTickets = trpc.tickets.createMany.useMutation({
     onSuccess: (data) => {
-      if (data && price === 0) {
+      if (data && price === null) {
         setErrorMessage('');
         setTicketGroupIdCreated(data[0].ticketGroupId ?? undefined);
       }
     },
     onError: (error) => {
       const errors = Object.values(error.data?.zodError?.fieldErrors ?? {})[0];
-      console.log('Error:', errors);
 
       setErrorMessage(
         errors?.[0] ||
@@ -104,7 +104,7 @@ function TicketPurchaseModal({
   // Obtener los pdfs de los tickets
   const { data: pdfs, isLoading: isLoadingPdf } =
     trpc.ticketGroup.getPdf.useQuery(ticketGroupIdCreated ?? '', {
-      enabled: price === 0 && !!ticketGroupIdCreated,
+      enabled: price === null && !!ticketGroupIdCreated,
     });
 
   useEffect(() => {
@@ -196,7 +196,7 @@ function TicketPurchaseModal({
   };
 
   const handleSubmit = async () => {
-    if (price === 0) {
+    if (price === null) {
       try {
         if (!formData.nombre) {
           setErrorMessage('El nombre del titular de la entrada es obligatorio');
@@ -211,23 +211,10 @@ function TicketPurchaseModal({
         await submitTickets();
         // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
       } catch (error) {}
-    } else if (price > 0) {
+    } else if (price !== null && price > 0) {
       await createPreference.mutateAsync({
         ticket_group_id: ticketGroupId,
-        items: [
-          {
-            id: '1',
-            title:
-              'Ticket ' +
-              (ticketType === 'PARTICIPANT'
-                ? 'participante'
-                : ticketType === 'STAFF'
-                  ? 'staff'
-                  : 'espectador'),
-            quantity: ticketsCount,
-            unit_price: price,
-          },
-        ],
+        ticket_type: ticketType,
       });
     } else {
       setErrorMessage(
@@ -238,6 +225,8 @@ function TicketPurchaseModal({
 
   const handleSuccessModalClose = () => {
     setShowSuccessModal(false);
+    setPdfData([]);
+    setTicketGroupIdCreated(undefined);
   };
 
   return (

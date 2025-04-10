@@ -46,10 +46,6 @@ function TicketPurchase({
       .mutateAsync({
         eventId,
         amountTickets: parseInt(quantity),
-        status:
-          eventTicket.price === null || eventTicket.price === 0
-            ? 'FREE'
-            : 'BOOKED',
       })
       .then((ticketGroupData) => {
         setTicketGroupId(ticketGroupData.id);
@@ -133,7 +129,7 @@ function TicketPurchase({
         isOpen={isModalOpen}
         onClose={handleCloseModal}
         quantity={quantity}
-        price={eventTicket.price || 0}
+        price={eventTicket.price}
         eventId={eventId}
         ticketType={eventTicket.type}
         ticketGroupId={ticketGroupId || ''}
