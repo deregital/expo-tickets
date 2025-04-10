@@ -1,4 +1,5 @@
 import { fetchClient } from '@/server/fetchClient';
+import { getAuthToken } from '@/server/auth/actions';
 import { initTRPC, TRPCError } from '@trpc/server';
 import superjson from 'superjson';
 import { ZodError } from 'zod';
@@ -10,7 +11,8 @@ export function handleError(error: {
 }): TRPCError | undefined {
   const { message, statusCode, error: cause } = error;
 
-  const messageString = message[0];
+  const messageString = Array.isArray(message) ? message[0] : message;
+
   const errorCode = statusCode as
     | 200
     | 400
@@ -91,6 +93,25 @@ const t = initTRPC.context<typeof createTRPCContext>().create({
 //   });
 // });
 
+const ticketsAuthMiddleware = t.middleware(async ({ ctx, next }) => {
+  try {
+    const token = await getAuthToken();
+
+    return next({
+      ctx: {
+        ...ctx,
+        fetch: fetchClient,
+      },
+    });
+  } catch (error) {
+    throw new TRPCError({
+      code: 'UNAUTHORIZED',
+      message: 'No se pudo autenticar con el servicio de tickets',
+      cause: error,
+    });
+  }
+});
+
 export const router = t.router;
 export const publicProcedure = t.procedure.use(({ ctx, next }) => {
   return next({
@@ -100,4 +121,5 @@ export const publicProcedure = t.procedure.use(({ ctx, next }) => {
     },
   });
 });
+export const ticketsProcedure = t.procedure.use(ticketsAuthMiddleware);
 export const createCallerFactory = t.createCallerFactory;
