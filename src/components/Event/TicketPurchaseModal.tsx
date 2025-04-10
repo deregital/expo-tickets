@@ -1,5 +1,10 @@
 'use client';
-import { useState, useEffect, type HTMLInputTypeAttribute } from 'react';
+import {
+  useState,
+  useEffect,
+  type HTMLInputTypeAttribute,
+  useCallback,
+} from 'react';
 import {
   Dialog,
   DialogContent,
@@ -10,12 +15,13 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import BuyTicketsModal from './BuyTicketsModal';
 import { trpc } from '@/server/trpc/client';
+import { type EventTicket } from 'expo-backend-types';
 
 interface TicketPurchaseModalProps {
   isOpen: boolean;
   onClose: (bought: boolean) => void;
   quantity: string;
-  price: number;
+  price: EventTicket['price'];
   eventId: string;
   ticketType: 'PARTICIPANT' | 'STAFF' | 'SPECTATOR';
   ticketGroupId: string;
@@ -57,14 +63,36 @@ function TicketPurchaseModal({
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [pdfData, setPdfData] = useState<PdfData>([]);
+  const [ticketGroupIdCreated, setTicketGroupIdCreated] = useState<
+    string | undefined
+  >(undefined);
 
   const createManyTickets = trpc.tickets.createMany.useMutation({
     onSuccess: (data) => {
-      if (data?.pdfs) {
+      if (data && price === null) {
         setErrorMessage('');
-        setPdfData(data.pdfs);
-        setShowSuccessModal(true);
-        handleClose(true);
+        setTicketGroupIdCreated(data[0].ticketGroupId ?? undefined);
+      }
+    },
+    onError: (error) => {
+      const errors = Object.values(error.data?.zodError?.fieldErrors ?? {})[0];
+
+      setErrorMessage(
+        errors?.[0] ||
+          'Se ha producido un error al comprar los tickets. Vuelva a intentarlo.',
+      );
+    },
+  });
+  const createPreference = trpc.mercadopago.createPreference.useMutation({
+    onSuccess: async (data) => {
+      console.log('Preference:', data);
+      if (data.init_point) {
+        await submitTickets();
+        window.location.href = data.init_point;
+      } else {
+        setErrorMessage(
+          'Hubo un error al crear el link de pago para la compra de los tickets. Por favor, intente nuevamente.',
+        );
       }
     },
     onError: (error) => {
@@ -78,6 +106,28 @@ function TicketPurchaseModal({
     },
   });
 
+  // Obtener los pdfs de los tickets
+  const { data: pdfs, isLoading: isLoadingPdf } =
+    trpc.ticketGroup.getPdf.useQuery(ticketGroupIdCreated ?? '', {
+      enabled: price === null && !!ticketGroupIdCreated,
+    });
+
+  const handleClose = useCallback(
+    (bought: boolean) => {
+      setErrorMessage('');
+      onClose(bought);
+    },
+    [onClose],
+  );
+
+  useEffect(() => {
+    if (pdfs?.pdfs) {
+      setPdfData(pdfs.pdfs);
+      setShowSuccessModal(true);
+      handleClose(true);
+    }
+  }, [handleClose, pdfs]);
+
   const ticketsCount = parseInt(quantity, 10);
 
   const [formData, setFormData] = useState<ReturnType<typeof defaultState>>(
@@ -86,12 +136,7 @@ function TicketPurchaseModal({
 
   useEffect(() => {
     setFormData(defaultState(ticketsCount));
-  }, [ticketsCount, isOpen]); // }, [isOpen, ticketsCount]);
-
-  function handleClose(bought: boolean) {
-    setErrorMessage('');
-    onClose(bought);
-  }
+  }, [ticketsCount, isOpen]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -120,8 +165,46 @@ function TicketPurchaseModal({
     });
   };
 
+  const submitTickets = async () => {
+    if (quantity === '1') {
+      await createManyTickets.mutateAsync([
+        {
+          eventId: eventId,
+          ticketGroupId: ticketGroupId,
+          type: ticketType,
+          fullName: formData.nombre
+            ? formData.nombre.length > 0
+              ? formData.nombre + ' ' + formData.apellido
+              : formData.apellido
+            : formData.apellido,
+          mail: formData.email,
+          dni: formData.dni,
+        },
+      ]);
+    } else {
+      await createManyTickets.mutateAsync([
+        {
+          eventId: eventId,
+          ticketGroupId: ticketGroupId,
+          type: ticketType,
+          fullName: formData.nombre + ' ' + formData.apellido,
+          mail: formData.email,
+          dni: formData.dni,
+        },
+        ...formData.additionalTickets.map((ticket, index) => ({
+          ticketGroupId: ticketGroupId,
+          eventId: eventId,
+          type: ticketType,
+          fullName: ticket,
+          mail: formData.email,
+          dni: formData.additionalDnis[index],
+        })),
+      ]);
+    }
+  };
+
   const handleSubmit = async () => {
-    if (price === 0) {
+    if (price === null) {
       try {
         if (!formData.nombre) {
           setErrorMessage('El nombre del titular de la entrada es obligatorio');
@@ -133,43 +216,14 @@ function TicketPurchaseModal({
           );
           return;
         }
-        if (quantity === '1') {
-          await createManyTickets.mutateAsync([
-            {
-              eventId: eventId,
-              ticketGroupId: ticketGroupId,
-              type: ticketType,
-              fullName: formData.nombre
-                ? formData.nombre.length > 0
-                  ? formData.nombre + ' ' + formData.apellido
-                  : formData.apellido
-                : formData.apellido,
-              mail: formData.email,
-              dni: formData.dni,
-            },
-          ]);
-        } else {
-          await createManyTickets.mutateAsync([
-            {
-              eventId: eventId,
-              ticketGroupId: ticketGroupId,
-              type: ticketType,
-              fullName: formData.nombre + ' ' + formData.apellido,
-              mail: formData.email,
-              dni: formData.dni,
-            },
-            ...formData.additionalTickets.map((ticket, index) => ({
-              ticketGroupId: ticketGroupId,
-              eventId: eventId,
-              type: ticketType,
-              fullName: ticket,
-              mail: formData.email,
-              dni: formData.additionalDnis[index],
-            })),
-          ]);
-        }
+        await submitTickets();
         // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
       } catch (error) {}
+    } else if (price !== null && price > 0) {
+      await createPreference.mutateAsync({
+        ticket_group_id: ticketGroupId,
+        ticket_type: ticketType,
+      });
     } else {
       setErrorMessage(
         'Hubo un error al crear los tickets. Por favor, intente nuevamente.',
@@ -179,6 +233,8 @@ function TicketPurchaseModal({
 
   const handleSuccessModalClose = () => {
     setShowSuccessModal(false);
+    setPdfData([]);
+    setTicketGroupIdCreated(undefined);
   };
 
   return (
@@ -250,7 +306,7 @@ function TicketPurchaseModal({
               )}
               <Button
                 onClick={handleSubmit}
-                disabled={createManyTickets.isPending}
+                disabled={createManyTickets.isPending || isLoadingPdf}
                 className='w-full bg-MiExpo_purple hover:bg-MiExpo_purple/90 text-MiExpo_white cursor-pointer py-3 rounded-[10px] font-medium uppercase'
               >
                 CONFIRMAR

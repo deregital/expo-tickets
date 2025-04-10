@@ -8,7 +8,7 @@ import { type RouterOutputs } from '@/server/routers/app';
 interface BuyTicketsModalProps {
   isOpen: boolean;
   onClose: () => void;
-  pdfs?: RouterOutputs['tickets']['createMany']['pdfs'];
+  pdfs?: RouterOutputs['ticketGroup']['getPdf']['pdfs'];
 }
 
 function BuyTicketsModal({ isOpen, onClose, pdfs }: BuyTicketsModalProps) {

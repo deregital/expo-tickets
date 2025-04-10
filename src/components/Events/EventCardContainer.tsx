@@ -13,7 +13,7 @@ interface EventCardContainerProps {
 
 function EventCardContainer({ event }: EventCardContainerProps) {
   const { day, month, year, time, dayOfWeek } = formatEventDate(
-    event.startingDate,
+    event.endingDate,
   );
 
   const eventTicket = event.eventTickets.filter(

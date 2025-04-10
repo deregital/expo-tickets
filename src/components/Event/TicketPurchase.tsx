@@ -46,10 +46,6 @@ function TicketPurchase({
       .mutateAsync({
         eventId,
         amountTickets: parseInt(quantity),
-        status:
-          eventTicket.price === null || eventTicket.price === 0
-            ? 'FREE'
-            : 'BOOKED',
       })
       .then((ticketGroupData) => {
         setTicketGroupId(ticketGroupData.id);
@@ -60,8 +56,8 @@ function TicketPurchase({
 
   const handleCloseModal = async (bought: boolean) => {
     setIsModalOpen(false);
-    if (!bought) {
-      await deleteTicketGroup.mutateAsync(ticketGroupId || '').then(() => {
+    if (!bought && ticketGroupId) {
+      await deleteTicketGroup.mutateAsync(ticketGroupId).then(() => {
         setTicketGroupId(null);
       });
     }
@@ -111,11 +107,7 @@ function TicketPurchase({
         <Button
           className='bg-MiExpo_purple cursor-pointer col-span-1 hover:bg-MiExpo_purple/90 text-MiExpo_white font-medium text-[12px] sm:text-[16px] leading-[100%] px-8 py-2 rounded-[10px]'
           onClick={handlePurchase}
-          disabled={
-            quantity === '0' ||
-            Boolean(eventTicket?.price && eventTicket.price > 0) ||
-            ticketsAvailable < parseInt(quantity)
-          }
+          disabled={quantity === '0' || ticketsAvailable < parseInt(quantity)}
         >
           COMPRAR
         </Button>
@@ -137,7 +129,7 @@ function TicketPurchase({
         isOpen={isModalOpen}
         onClose={handleCloseModal}
         quantity={quantity}
-        price={eventTicket.price || 0}
+        price={eventTicket.price}
         eventId={eventId}
         ticketType={eventTicket.type}
         ticketGroupId={ticketGroupId || ''}
