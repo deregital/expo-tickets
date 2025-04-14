@@ -87,29 +87,39 @@ function TicketPurchase({
           ${eventTicket?.price ? eventTicket.price : 0}
         </div>
         <div className='flex justify-end'>
-          <Select value={quantity} onValueChange={setQuantity}>
-            <SelectTrigger className='w-24 bg-white text-MiExpo_black border border-MiExpo_gray'>
-              <SelectValue placeholder='1' />
-            </SelectTrigger>
-            <SelectContent align='end'>
-              {[1, 2, 3, 4, 5].map((num) => (
-                <SelectItem key={num} value={num.toString()}>
-                  {num}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          {ticketsAvailable > 0 ? (
+            <Select value={quantity} onValueChange={setQuantity}>
+              <SelectTrigger className='w-24 bg-white text-MiExpo_black border border-MiExpo_gray'>
+                <SelectValue placeholder='1' />
+              </SelectTrigger>
+              <SelectContent align='end'>
+                {[1, 2, 3, 4, 5].map((num) => (
+                  <SelectItem key={num} value={num.toString()}>
+                    {num}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          ) : (
+            <div className='text-red-500 font-medium'>Entradas agotadas!</div>
+          )}
         </div>
       </div>
 
       {/* Botón de compra */}
       <div className='mt-4 grid grid-cols-3'>
         <Button
-          className='bg-MiExpo_purple cursor-pointer col-span-1 hover:bg-MiExpo_purple/90 text-MiExpo_white font-medium text-[12px] sm:text-[16px] leading-[100%] px-8 py-2 rounded-[10px]'
+          className={`bg-MiExpo_purple cursor-pointer col-span-1 hover:bg-MiExpo_purple/90 text-MiExpo_white font-medium text-[12px] sm:text-[16px] leading-[100%] px-8 py-2 rounded-[10px] ${
+            ticketsAvailable === 0
+              ? 'opacity-50 cursor-not-allowed bg-red-500'
+              : ''
+          }`}
           onClick={handlePurchase}
-          disabled={quantity === '0' || ticketsAvailable < parseInt(quantity)}
+          disabled={
+            ticketsAvailable < parseInt(quantity) || ticketsAvailable === 0
+          }
         >
-          COMPRAR
+          {ticketsAvailable ? 'COMPRAR' : 'AGOTADO'}
         </Button>
       </div>
 

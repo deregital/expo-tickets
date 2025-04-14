@@ -2,7 +2,6 @@
 import { formatEventDate } from '@/lib/utils';
 import CardEvent from './CardEvent';
 import Link from 'next/link';
-import { useEventTickets } from '@/hooks/useEventTickets';
 import { type RouterOutputs } from '@/server/routers/app';
 
 type Event = RouterOutputs['filterEvents']['getEvents']['events'][number];
@@ -20,7 +19,7 @@ function EventCardContainer({ event }: EventCardContainerProps) {
     (ticket) => ticket.type === 'SPECTATOR',
   )[0];
 
-  const { eventDisabled } = useEventTickets(event.id, eventTicket);
+  //const { eventDisabled } = useEventTickets(event.id, eventTicket);
 
   const cardEvent = (
     <CardEvent
@@ -31,15 +30,11 @@ function EventCardContainer({ event }: EventCardContainerProps) {
       year={year}
       time={time}
       imageUrl='/Foto.png'
-      disabled={eventDisabled}
+      //disabled={eventDisabled}
     />
   );
 
-  return eventDisabled ? (
-    cardEvent
-  ) : (
-    <Link href={`/${event.id}`}>{cardEvent}</Link>
-  );
+  return <Link href={`/${event.id}`}>{cardEvent}</Link>;
 }
 
 export default EventCardContainer;

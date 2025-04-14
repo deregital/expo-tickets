@@ -24,6 +24,13 @@ async function EventPage({ params }: EventPageProps) {
       </div>
     );
   }
+  if (eventTicketSpectator === undefined) {
+    return (
+      <div className='max-w-7xl mx-5 md:mx-[3rem] py-8 px-4'>
+        <h1 className='text-2xl font-bold text-center'>Evento no disponible</h1>
+      </div>
+    );
+  }
 
   return (
     <div className='flex justify-center px-1 sm:px-4 my-14'>
