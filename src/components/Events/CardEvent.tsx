@@ -24,7 +24,7 @@ function CardEvent({
 }: CardEventProps) {
   return (
     <div
-      className={`${disabled ? 'bg-gray-200' : 'bg-white'} rounded-[20px] overflow-hidden drop-shadow-md ${disabled ? 'cursor-not-allowed opacity-50' : 'hover:shadow-[0_0_15px_8px_rgba(0,0,0,0.1)] hover:cursor-pointer'} transition-all duration-300 w-[150px] sm:w-[240px]`}
+      className={`bg-white rounded-[20px] overflow-hidden drop-shadow-md ${disabled ? 'cursor-not-allowed opacity-50' : 'hover:shadow-[0_0_15px_8px_rgba(0,0,0,0.1)] hover:cursor-pointer'} transition-all duration-300 w-[150px] sm:w-[240px]`}
     >
       <div
         className={`relative h-[120px] sm:h-[180px] w-full ${disabled ? 'bg-gray-300' : 'bg-MiExpo_purple/10'}`}
