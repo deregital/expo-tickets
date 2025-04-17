@@ -86,9 +86,9 @@ function TicketPurchaseModal({
   const createPreference = trpc.mercadopago.createPreference.useMutation({
     onSuccess: async (data) => {
       console.log('Preference:', data);
-      if (data.init_point) {
+      if ('init_point' in data.response) {
         await submitTickets();
-        window.location.href = data.init_point;
+        window.location.href = data.response.init_point as string;
       } else {
         setErrorMessage(
           'Hubo un error al crear el link de pago para la compra de los tickets. Por favor, intente nuevamente.',
