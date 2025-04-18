@@ -12,14 +12,8 @@ interface EventCardContainerProps {
 
 function EventCardContainer({ event }: EventCardContainerProps) {
   const { day, month, year, time, dayOfWeek } = formatEventDate(
-    event.endingDate,
+    event.startingDate,
   );
-
-  const eventTicket = event.eventTickets.filter(
-    (ticket) => ticket.type === 'SPECTATOR',
-  )[0];
-
-  //const { eventDisabled } = useEventTickets(event.id, eventTicket);
 
   const cardEvent = (
     <CardEvent
@@ -30,7 +24,6 @@ function EventCardContainer({ event }: EventCardContainerProps) {
       year={year}
       time={time}
       imageUrl='/Foto.png'
-      //disabled={eventDisabled}
     />
   );
 
