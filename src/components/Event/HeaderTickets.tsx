@@ -8,20 +8,15 @@ function HeaderTickets({
 }: {
   event: RouterOutputs['filterEvents']['getEvents']['events'][number];
 }) {
-  // Formatear la fecha para mostrarla en español
+  // Formatear la fecha
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return format(date, "EEEE d 'de' MMMM yyyy", { locale: es });
+    return format(date, "EEEE d 'de' MMMM yyyy - HH:mm 'hrs.'", {
+      locale: es,
+    });
   };
 
-  // Formatear la hora
-  const formatTime = (dateString: string) => {
-    const date = new Date(dateString);
-    return format(date, "HH:mm 'hrs.'", { locale: es });
-  };
-
-  const formattedDate = formatDate(event.date);
-  const formattedTime = formatTime(event.startingDate);
+  const formattedDate = formatDate(event.startingDate);
 
   return (
     <div className='grid grid-cols-1 md:grid-cols-16 w-full h-full overflow-hidden'>
@@ -30,8 +25,8 @@ function HeaderTickets({
         <h1 className='text-2xl md:text-3xl font-bold text-black truncate'>
           {event.name}
         </h1>
-        <p className='text-MiExpo_purple mt-2 whitespace-nowrap overflow-hidden text-sm md:text-base text-ellipsis'>
-          {formattedDate} - {formattedTime}
+        <p className='text-MiExpo_purple capitalize mt-2 whitespace-nowrap overflow-hidden text-sm md:text-base text-ellipsis'>
+          {formattedDate}
         </p>
       </div>
 

@@ -85,7 +85,6 @@ function TicketPurchaseModal({
   });
   const createPreference = trpc.mercadopago.createPreference.useMutation({
     onSuccess: async (data) => {
-      console.log('Preference:', data);
       if ('init_point' in data.response) {
         await submitTickets();
         window.location.href = data.response.init_point as string;
@@ -97,7 +96,6 @@ function TicketPurchaseModal({
     },
     onError: (error) => {
       const errors = Object.values(error.data?.zodError?.fieldErrors ?? {})[0];
-      console.log('Error:', errors);
 
       setErrorMessage(
         errors?.[0] ||
@@ -278,7 +276,10 @@ function TicketPurchaseModal({
             {ticketsCount > 1 && (
               <>
                 {Array.from({ length: ticketsCount - 1 }).map((_, index) => (
-                  <div key={index} className='space-y-4 mb-4'>
+                  <div
+                    key={index}
+                    className='space-y-4 mb-4 border-t-3 border-MiExpo_purple/50 pt-4'
+                  >
                     <InputWithLabel
                       label={`Nombre y apellido del titular de la entrada ${index + 2}`}
                       value={formData.additionalTickets[index]}
