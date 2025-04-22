@@ -48,7 +48,7 @@ async function EventPage({ params }: EventPageProps) {
             />
           </div>
           <div className='px-4 md:col-span-4 flex flex-col justify-start items-center overflow-hidden'>
-            <InformationEvent />
+            <InformationEvent description={event.description} />
           </div>
         </div>
       </main>

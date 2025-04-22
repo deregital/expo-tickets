@@ -1,15 +1,20 @@
-function InformationEvent() {
+import { type RouterOutputs } from '@/server/routers/app';
+
+interface InformationEventProps {
+  description: RouterOutputs['filterEvents']['getEventById']['description'];
+}
+function InformationEvent({ description }: InformationEventProps) {
   return (
-    <div className='flex flex-col items-center justify-center bg-MiExpo_white rounded-[20px] mb-4 md:mb-0 px-4 py-6'>
-      <h1 className='font-bold text-[16px] text-MiExpo_black leading-[100%] font-sans mb-3'>
-        Información del evento
-      </h1>
-      <p className='text-[16px] text-center text-black leading-[100%] font-light font-sans mb-10'>
-        Info del evento: Lorem ipsum dolor sit amet consectetur. Commodo
-        porttitor et ut risus. In convallis vivamus felis aliquam tristique
-        dolor odio tortor ornare.
-      </p>
-      <p className='text-[14px] underline text-center text-MiExpo_purple leading-[100%] font-light font-sans'>
+    <div className='h-[calc(100%-16px)] bg-MiExpo_white rounded-[20px] w-full mb-4 md:mb-0'>
+      <div className='flex flex-col items-center justify-start px-4 py-6'>
+        <h1 className='font-bold text-[16px] text-MiExpo_black leading-[100%] font-sans mb-3'>
+          Información del evento
+        </h1>
+        <p className='text-[16px] text-center text-black leading-[100%] font-light font-sans mb-10'>
+          {description || 'No hay descripción'}
+        </p>
+      </div>
+      <p className='relative md:-bottom-12 bottom-4 px-4 text-[14px] underline text-center text-MiExpo_purple leading-[100%] font-light font-sans'>
         Contactate con nombre_productora
       </p>
     </div>
