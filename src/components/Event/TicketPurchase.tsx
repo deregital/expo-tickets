@@ -101,7 +101,9 @@ function TicketPurchase({
               </SelectContent>
             </Select>
           ) : (
-            <div className='text-red-500 font-medium'>Entradas agotadas!</div>
+            <div className='text-red-500 font-medium text-[12px] sm:text-[16px]'>
+              Entradas agotadas!
+            </div>
           )}
         </div>
       </div>
@@ -130,7 +132,7 @@ function TicketPurchase({
           amet consectetur. Commodo porttitor et ut risus. In convallis vivamus
           felis aliquam tristique dolor odio tortor ornare. Consectetur suscipit
           at ipsum proin id dictum. Tortor quisque risus volutpat purus sit nec
-          ornare et.
+          ornare et
         </p>
       </div>
 

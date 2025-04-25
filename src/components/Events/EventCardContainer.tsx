@@ -23,7 +23,7 @@ function EventCardContainer({ event }: EventCardContainerProps) {
       month={month}
       year={year}
       time={time}
-      imageUrl='/Foto.png'
+      imageUrl={event.mainPictureUrl || '/Foto.png'}
     />
   );
 
