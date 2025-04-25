@@ -101,7 +101,9 @@ function TicketPurchase({
               </SelectContent>
             </Select>
           ) : (
-            <div className='text-red-500 font-medium'>Entradas agotadas!</div>
+            <div className='text-red-500 font-medium text-[12px] sm:text-[16px]'>
+              Entradas agotadas!
+            </div>
           )}
         </div>
       </div>

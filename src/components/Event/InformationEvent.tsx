@@ -11,7 +11,7 @@ function InformationEvent({ description }: InformationEventProps) {
           Información del evento
         </h1>
         <p className='text-[16px] text-center text-black leading-[100%] font-light font-sans mb-10'>
-          {description || 'No hay descripción'}
+          {description}
         </p>
       </div>
       <p className='relative md:-bottom-12 bottom-4 px-4 text-[14px] underline text-center text-MiExpo_purple leading-[100%] font-light font-sans'>
