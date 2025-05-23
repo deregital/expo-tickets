@@ -41,6 +41,7 @@ function defaultState(ticketCount: number) {
     dni: '',
     additionalTickets: Array(Math.max(0, ticketCount - 1)).fill(''),
     additionalDnis: Array(Math.max(0, ticketCount - 1)).fill(''),
+    referralCode: '',
   } as {
     nombre: string;
     apellido: string;
@@ -48,6 +49,7 @@ function defaultState(ticketCount: number) {
     dni: string;
     additionalTickets: string[];
     additionalDnis: string[];
+    referralCode: string;
   };
 }
 
@@ -132,6 +134,13 @@ function TicketPurchaseModal({
     defaultState(ticketsCount),
   );
 
+  const isReferralCodeValid = trpc.profile.referralCodeExists.useQuery(
+    formData.referralCode,
+    {
+      enabled: false,
+    },
+  );
+
   useEffect(() => {
     setFormData(defaultState(ticketsCount));
   }, [ticketsCount, isOpen]);
@@ -177,6 +186,7 @@ function TicketPurchaseModal({
             : formData.apellido,
           mail: formData.email,
           dni: formData.dni,
+          referralCode: formData.referralCode,
         },
       ]);
     } else {
@@ -188,6 +198,7 @@ function TicketPurchaseModal({
           fullName: formData.nombre + ' ' + formData.apellido,
           mail: formData.email,
           dni: formData.dni,
+          referralCode: formData.referralCode,
         },
         ...formData.additionalTickets.map((ticket, index) => ({
           ticketGroupId: ticketGroupId,
@@ -196,6 +207,7 @@ function TicketPurchaseModal({
           fullName: ticket,
           mail: formData.email,
           dni: formData.additionalDnis[index],
+          referralCode: formData.referralCode,
         })),
       ]);
     }
@@ -213,6 +225,15 @@ function TicketPurchaseModal({
             'El apellido del titular de la entrada es obligatorio',
           );
           return;
+        }
+        if (formData.referralCode) {
+          const isValid = await isReferralCodeValid.refetch();
+          if (!isValid.data?.exists) {
+            setErrorMessage(
+              'El codigo de referido no corresponde a ningun usuario',
+            );
+            return;
+          }
         }
         await submitTickets();
         // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
@@ -301,6 +322,14 @@ function TicketPurchaseModal({
                 ))}
               </>
             )}
+
+            <InputWithLabel
+              label='Codigo de referido'
+              value={formData.referralCode}
+              onChange={handleChange}
+              name='referralCode'
+            />
+
             <div className='mt-6'>
               {errorMessage.length > 0 && (
                 <p className='text-red-500 text-sm mb-2'>{errorMessage}</p>
