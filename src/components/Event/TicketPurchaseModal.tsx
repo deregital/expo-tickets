@@ -16,6 +16,7 @@ import { Button } from '@/components/ui/button';
 import BuyTicketsModal from './BuyTicketsModal';
 import { trpc } from '@/server/trpc/client';
 import { type EventTicket } from 'expo-backend-types';
+import { Separator } from '@/components/ui/separator';
 
 interface TicketPurchaseModalProps {
   isOpen: boolean;
@@ -322,13 +323,18 @@ function TicketPurchaseModal({
                 ))}
               </>
             )}
-
-            <InputWithLabel
-              label='Codigo de referido'
-              value={formData.referralCode}
-              onChange={handleChange}
-              name='referralCode'
-            />
+            <Separator className='my-8' />
+            <div className='overflow-hidden'>
+              <Input
+                required
+                name='referralCode'
+                value={formData.referralCode}
+                onChange={handleChange}
+                type='text'
+                placeholder='Codigo de referido'
+                className='w-full h-10 rounded-[10px] border border-MiExpo_gray bg-MiExpo_white focus:ring-0 focus:outline-none focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none px-4'
+              />
+            </div>
 
             <div className='mt-6'>
               {errorMessage.length > 0 && (
