@@ -17,6 +17,7 @@ import BuyTicketsModal from './BuyTicketsModal';
 import { trpc } from '@/server/trpc/client';
 import { type EventTicket } from 'expo-backend-types';
 import { Separator } from '@/components/ui/separator';
+import { cn } from '@/lib/utils';
 
 interface TicketPurchaseModalProps {
   isOpen: boolean;
@@ -217,10 +218,19 @@ function TicketPurchaseModal({
   const handleSubmit = async () => {
     if (price === null) {
       try {
-        if (!formData.nombre) {
+        if (
+          !formData.nombre ||
+          formData.additionalTickets.some((t) => t.length === 0)
+        ) {
           setErrorMessage('El nombre del titular de la entrada es obligatorio');
           return;
         }
+
+        if (formData.additionalDnis.some((d) => d.length === 0)) {
+          setErrorMessage('El DNI del titular de la entrada es obligatorio');
+          return;
+        }
+
         if (!formData.apellido) {
           setErrorMessage(
             'El apellido del titular de la entrada es obligatorio',
@@ -231,7 +241,7 @@ function TicketPurchaseModal({
           const isValid = await isReferralCodeValid.refetch();
           if (!isValid.data?.exists) {
             setErrorMessage(
-              'El codigo de referido no corresponde a ningun usuario',
+              'El código de referido no corresponde a ningún usuario',
             );
             return;
           }
@@ -292,6 +302,7 @@ function TicketPurchaseModal({
               value={formData.dni}
               onChange={handleChange}
               name='dni'
+              type='number'
             />
 
             {/* Tickets adicionales */}
@@ -323,23 +334,30 @@ function TicketPurchaseModal({
                 ))}
               </>
             )}
-            <Separator className='my-8' />
-            <div className='overflow-hidden'>
+            <Separator className='my-8 bg-MiExpo_purple/50' />
+            <div className='overflow-hidden mb-3'>
               <Input
                 required
                 name='referralCode'
                 value={formData.referralCode}
                 onChange={handleChange}
                 type='text'
-                placeholder='Codigo de referido'
-                className='w-full h-10 rounded-[10px] border border-MiExpo_gray bg-MiExpo_white focus:ring-0 focus:outline-none focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none px-4'
+                placeholder='Código de referido'
+                className={cn(
+                  'w-full h-10 rounded-[10px] border-2 border-dashed bg-MiExpo_white focus:ring-0 focus:outline-none focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none px-4',
+                  isReferralCodeValid.data?.exists === false
+                    ? 'border-red-500'
+                    : 'border-MiExpo_gray',
+                )}
               />
+              {errorMessage.length > 0 && (
+                <p className='text-red-500 text-sm font-bold mt-1 pl-0.5'>
+                  {errorMessage}
+                </p>
+              )}
             </div>
 
-            <div className='mt-6'>
-              {errorMessage.length > 0 && (
-                <p className='text-red-500 text-sm mb-2'>{errorMessage}</p>
-              )}
+            <div className='mt-2'>
               <Button
                 onClick={handleSubmit}
                 disabled={createManyTickets.isPending || isLoadingPdf}
@@ -388,7 +406,7 @@ function InputWithLabel({
         value={value}
         onChange={onChange}
         type={type}
-        className='w-full h-10 rounded-[10px] border border-MiExpo_gray bg-MiExpo_white rounded-tl-none focus:ring-0 focus:outline-none focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none px-4'
+        className='w-full h-10 rounded-[10px] border border-MiExpo_gray bg-MiExpo_white rounded-tl-none focus:ring-0 focus:outline-none focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none px-4 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none'
       />
     </div>
   );
