@@ -176,42 +176,45 @@ function TicketPurchaseModal({
 
   const submitTickets = async () => {
     if (quantity === '1') {
-      await createManyTickets.mutateAsync([
-        {
-          eventId: eventId,
-          ticketGroupId: ticketGroupId,
-          type: ticketType,
-          fullName: formData.nombre
-            ? formData.nombre.length > 0
-              ? formData.nombre + ' ' + formData.apellido
-              : formData.apellido
-            : formData.apellido,
-          mail: formData.email,
-          dni: formData.dni,
-          referralCode: formData.referralCode,
-        },
-      ]);
+      await createManyTickets.mutateAsync({
+        tickets: [
+          {
+            eventId: eventId,
+            ticketGroupId: ticketGroupId,
+            type: ticketType,
+            fullName: formData.nombre
+              ? formData.nombre.length > 0
+                ? formData.nombre + ' ' + formData.apellido
+                : formData.apellido
+              : formData.apellido,
+            mail: formData.email,
+            dni: formData.dni,
+          },
+        ],
+        referralCode: formData.referralCode,
+      });
     } else {
-      await createManyTickets.mutateAsync([
-        {
-          eventId: eventId,
-          ticketGroupId: ticketGroupId,
-          type: ticketType,
-          fullName: formData.nombre + ' ' + formData.apellido,
-          mail: formData.email,
-          dni: formData.dni,
-          referralCode: formData.referralCode,
-        },
-        ...formData.additionalTickets.map((ticket, index) => ({
-          ticketGroupId: ticketGroupId,
-          eventId: eventId,
-          type: ticketType,
-          fullName: ticket,
-          mail: formData.email,
-          dni: formData.additionalDnis[index],
-          referralCode: formData.referralCode,
-        })),
-      ]);
+      await createManyTickets.mutateAsync({
+        tickets: [
+          {
+            eventId: eventId,
+            ticketGroupId: ticketGroupId,
+            type: ticketType,
+            fullName: formData.nombre + ' ' + formData.apellido,
+            mail: formData.email,
+            dni: formData.dni,
+          },
+          ...formData.additionalTickets.map((ticket, index) => ({
+            ticketGroupId: ticketGroupId,
+            eventId: eventId,
+            type: ticketType,
+            fullName: ticket,
+            mail: formData.email,
+            dni: formData.additionalDnis[index],
+          })),
+        ],
+        referralCode: formData.referralCode,
+      });
     }
   };
 
