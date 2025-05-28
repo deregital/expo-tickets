@@ -12,7 +12,7 @@ jobs:
       - uses: amondnet/vercel-action@v25.2.0
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-args: '--prod'
+          vercel-args: ${{ github.ref == 'refs/heads/master' && '--prod' || '' }}
           vercel-org-id: ${{ secrets.ORG_ID}}
           vercel-project-id: ${{ secrets.PROJECT_ID}}
       - name: preview-url
