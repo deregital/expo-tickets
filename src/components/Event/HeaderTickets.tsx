@@ -62,12 +62,11 @@ function HeaderTickets({
             />
           </div>
           <div className='text-sm lg:text-base h-full min-w-0'>
-            <p className='font-semibold text-black truncate'>
+            <p
+              className='font-semibold text-black line-clamp-3'
+              title={event.location}
+            >
               {event.location}
-            </p>
-            <p className='text-gray-600 truncate'>{event.location}</p>
-            <p className='text-gray-600 truncate'>
-              {event.location}, {event.location}
             </p>
           </div>
         </div>
