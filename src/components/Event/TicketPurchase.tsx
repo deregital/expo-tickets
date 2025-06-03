@@ -125,17 +125,6 @@ function TicketPurchase({
         </Button>
       </div>
 
-      {/* Disclaimer - usando margin-top auto para empujar al fondo */}
-      <div className='mt-auto pt-8 font-sans font-normal text-[12px] leading-[100%] text-black'>
-        <p>
-          Disclaimer del evento o la compra de entrada: Lorem ipsum dolor sit
-          amet consectetur. Commodo porttitor et ut risus. In convallis vivamus
-          felis aliquam tristique dolor odio tortor ornare. Consectetur suscipit
-          at ipsum proin id dictum. Tortor quisque risus volutpat purus sit nec
-          ornare et
-        </p>
-      </div>
-
       {/* Modal de compra de tickets */}
       <TicketPurchaseModal
         isOpen={isModalOpen}
