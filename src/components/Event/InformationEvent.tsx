@@ -14,9 +14,6 @@ function InformationEvent({ description }: InformationEventProps) {
           {description}
         </p>
       </div>
-      <p className='relative md:-bottom-12 bottom-4 px-4 text-[14px] underline text-center text-MiExpo_purple leading-[100%] font-light font-sans'>
-        Contactate con nombre_productora
-      </p>
     </div>
   );
 }
