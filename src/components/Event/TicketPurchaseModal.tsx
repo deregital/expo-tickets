@@ -16,6 +16,8 @@ import { Button } from '@/components/ui/button';
 import BuyTicketsModal from './BuyTicketsModal';
 import { trpc } from '@/server/trpc/client';
 import { type EventTicket } from 'expo-backend-types';
+import { Separator } from '@/components/ui/separator';
+import { cn } from '@/lib/utils';
 
 interface TicketPurchaseModalProps {
   isOpen: boolean;
@@ -41,6 +43,7 @@ function defaultState(ticketCount: number) {
     dni: '',
     additionalTickets: Array(Math.max(0, ticketCount - 1)).fill(''),
     additionalDnis: Array(Math.max(0, ticketCount - 1)).fill(''),
+    referralCode: '',
   } as {
     nombre: string;
     apellido: string;
@@ -48,6 +51,7 @@ function defaultState(ticketCount: number) {
     dni: string;
     additionalTickets: string[];
     additionalDnis: string[];
+    referralCode: string;
   };
 }
 
@@ -132,6 +136,13 @@ function TicketPurchaseModal({
     defaultState(ticketsCount),
   );
 
+  const isReferralCodeValid = trpc.profile.referralCodeExists.useQuery(
+    formData.referralCode,
+    {
+      enabled: false,
+    },
+  );
+
   useEffect(() => {
     setFormData(defaultState(ticketsCount));
   }, [ticketsCount, isOpen]);
@@ -165,54 +176,78 @@ function TicketPurchaseModal({
 
   const submitTickets = async () => {
     if (quantity === '1') {
-      await createManyTickets.mutateAsync([
-        {
-          eventId: eventId,
-          ticketGroupId: ticketGroupId,
-          type: ticketType,
-          fullName: formData.nombre
-            ? formData.nombre.length > 0
-              ? formData.nombre + ' ' + formData.apellido
-              : formData.apellido
-            : formData.apellido,
-          mail: formData.email,
-          dni: formData.dni,
-        },
-      ]);
+      await createManyTickets.mutateAsync({
+        tickets: [
+          {
+            eventId: eventId,
+            ticketGroupId: ticketGroupId,
+            type: ticketType,
+            fullName: formData.nombre
+              ? formData.nombre.length > 0
+                ? formData.nombre + ' ' + formData.apellido
+                : formData.apellido
+              : formData.apellido,
+            mail: formData.email,
+            dni: formData.dni,
+          },
+        ],
+        referralCode: formData.referralCode,
+      });
     } else {
-      await createManyTickets.mutateAsync([
-        {
-          eventId: eventId,
-          ticketGroupId: ticketGroupId,
-          type: ticketType,
-          fullName: formData.nombre + ' ' + formData.apellido,
-          mail: formData.email,
-          dni: formData.dni,
-        },
-        ...formData.additionalTickets.map((ticket, index) => ({
-          ticketGroupId: ticketGroupId,
-          eventId: eventId,
-          type: ticketType,
-          fullName: ticket,
-          mail: formData.email,
-          dni: formData.additionalDnis[index],
-        })),
-      ]);
+      await createManyTickets.mutateAsync({
+        tickets: [
+          {
+            eventId: eventId,
+            ticketGroupId: ticketGroupId,
+            type: ticketType,
+            fullName: formData.nombre + ' ' + formData.apellido,
+            mail: formData.email,
+            dni: formData.dni,
+          },
+          ...formData.additionalTickets.map((ticket, index) => ({
+            ticketGroupId: ticketGroupId,
+            eventId: eventId,
+            type: ticketType,
+            fullName: ticket,
+            mail: formData.email,
+            dni: formData.additionalDnis[index],
+          })),
+        ],
+        referralCode: formData.referralCode,
+      });
     }
   };
 
   const handleSubmit = async () => {
     if (price === null) {
       try {
-        if (!formData.nombre) {
+        if (
+          !formData.nombre ||
+          formData.additionalTickets.some((t) => t.length === 0)
+        ) {
           setErrorMessage('El nombre del titular de la entrada es obligatorio');
           return;
         }
+
+        if (formData.additionalDnis.some((d) => d.length === 0)) {
+          setErrorMessage('El DNI del titular de la entrada es obligatorio');
+          return;
+        }
+
         if (!formData.apellido) {
           setErrorMessage(
             'El apellido del titular de la entrada es obligatorio',
           );
           return;
+        }
+        if (formData.referralCode) {
+          const isValid = await isReferralCodeValid.refetch();
+          if (!isValid.data?.exists) {
+            setErrorMessage(
+              'El código de referido no corresponde a ningún usuario',
+            );
+            return;
+          }
         }
         await submitTickets();
         // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
@@ -270,6 +305,7 @@ function TicketPurchaseModal({
               value={formData.dni}
               onChange={handleChange}
               name='dni'
+              type='number'
             />
 
             {/* Tickets adicionales */}
@@ -301,10 +337,30 @@ function TicketPurchaseModal({
                 ))}
               </>
             )}
-            <div className='mt-6'>
+            <Separator className='my-8 bg-MiExpo_purple/50' />
+            <div className='overflow-hidden mb-3'>
+              <Input
+                required
+                name='referralCode'
+                value={formData.referralCode}
+                onChange={handleChange}
+                type='text'
+                placeholder='Código de referido'
+                className={cn(
+                  'w-full h-10 rounded-[10px] border-2 border-dashed bg-MiExpo_white focus:ring-0 focus:outline-none focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none px-4',
+                  isReferralCodeValid.data?.exists === false
+                    ? 'border-red-500'
+                    : 'border-MiExpo_gray',
+                )}
+              />
               {errorMessage.length > 0 && (
-                <p className='text-red-500 text-sm mb-2'>{errorMessage}</p>
+                <p className='text-red-500 text-sm font-bold mt-1 pl-0.5'>
+                  {errorMessage}
+                </p>
               )}
+            </div>
+
+            <div className='mt-2'>
               <Button
                 onClick={handleSubmit}
                 disabled={createManyTickets.isPending || isLoadingPdf}
@@ -353,7 +409,7 @@ function InputWithLabel({
         value={value}
         onChange={onChange}
         type={type}
-        className='w-full h-10 rounded-[10px] border border-MiExpo_gray bg-MiExpo_white rounded-tl-none focus:ring-0 focus:outline-none focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none px-4'
+        className='w-full h-10 rounded-[10px] border border-MiExpo_gray bg-MiExpo_white rounded-tl-none focus:ring-0 focus:outline-none focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none px-4 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none'
       />
     </div>
   );
