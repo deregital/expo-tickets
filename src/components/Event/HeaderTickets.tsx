@@ -1,6 +1,6 @@
 import { MapPin } from 'lucide-react';
 import { type RouterOutputs } from '@/server/routers/app';
-import { format } from 'date-fns';
+import { formatInTimeZone } from 'date-fns-tz';
 import { es } from 'date-fns/locale';
 
 function HeaderTickets({
@@ -11,9 +11,14 @@ function HeaderTickets({
   // Formatear la fecha
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return format(date, "EEEE d 'de' MMMM yyyy - HH:mm 'hrs.'", {
-      locale: es,
-    });
+    return formatInTimeZone(
+      date,
+      'America/Argentina/Buenos_Aires',
+      "EEEE d 'de' MMMM yyyy - HH:mm 'hrs.'",
+      {
+        locale: es,
+      },
+    );
   };
 
   const formattedDate = formatDate(event.startingDate);
