@@ -63,6 +63,10 @@ function TicketPurchase({
     }
   };
 
+  // [N]
+  const ticketAmountShowText = 50;
+  // [/N]
+
   return (
     <div className='rounded-[20px] border border-MiExpo_gray p-6 bg-white h-full flex flex-col font-sans'>
       {/* Encabezado de la tabla */}
@@ -80,8 +84,13 @@ function TicketPurchase({
 
       {/* Fila de ticket */}
       <div className='grid grid-cols-3 py-4 items-center'>
-        <div className='text-MiExpo_black text-[12px] sm:text-[16px] font-normal leading-[100%]'>
+        <div className='text-MiExpo_black flex flex-col text-[12px] sm:text-[16px] font-normal leading-[100%]'>
           {TICKET_INFORMATION.name}
+          {/* [N] */}
+          {ticketsAvailable <= ticketAmountShowText && (
+            <span className='text-xs text-red-500 font-bold'>{`Quedan solo ${ticketsAvailable} entradas!`}</span>
+          )}
+          {/* [/N] */}
         </div>
         <div className='text-MiExpo_black text-[12px] sm:text-[16px] font-normal leading-[100%] text-center'>
           ${eventTicket?.price ? eventTicket.price : 0}
