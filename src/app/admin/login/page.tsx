@@ -18,7 +18,7 @@ export default function LoginPage() {
   }, [state, router]);
 
   return (
-    <div className='flex items-center justify-center flex-col gap-4'>
+    <div className='flex h-full items-center justify-center flex-col gap-4'>
       <h1 className='text-xl font-bold text-center'>
         Iniciar sesión para administradores
       </h1>

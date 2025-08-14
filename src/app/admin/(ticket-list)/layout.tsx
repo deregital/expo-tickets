@@ -25,5 +25,5 @@ export default async function Layout({
     redirect('/admin/login');
   }
 
-  return <div>{children}</div>;
+  return children;
 }
